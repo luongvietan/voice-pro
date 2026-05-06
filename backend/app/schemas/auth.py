@@ -39,6 +39,7 @@ class UserSummary(BaseModel):
     display_name: str | None
     avatar_url: str | None
     balance_minutes: int
+    is_paid: bool = False
 
 
 class TokenResponse(BaseModel):

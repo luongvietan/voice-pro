@@ -64,5 +64,24 @@ services:
       redis:
         condition: service_started
 
+  beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app.celery_app beat --loglevel=info
+    volumes:
+      - ./backend:/app
+      - .:/voice_pro_root
+    environment:
+      DATABASE_URL: postgresql+psycopg2://voicepro:voicepro@postgres:5432/voicepro
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app:/voice_pro_root
+      VOICE_PRO_ROOT: /voice_pro_root
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
 volumes:
   vp_pg_dev:

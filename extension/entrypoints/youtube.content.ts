@@ -138,6 +138,34 @@ async function maybeRunPipeline() {
   const v = getVideo();
   if (!v) return;
 
+  const gate = await chrome.storage.local.get(["accessToken", "creditMinutes", "userHasPaidPlan"]);
+  if (typeof gate.accessToken !== "string" || !gate.accessToken) {
+    await chrome.storage.local.set({
+      dubStatus: "Error",
+      dubErrorMessage: "Cần đăng nhập để dub (API yêu cầu JWT).",
+    });
+    return;
+  }
+  // P12: creditMinutes undefined means storage not synced yet — block gracefully
+  if (gate.userHasPaidPlan !== true && typeof gate.creditMinutes !== "number") {
+    await chrome.storage.local.set({
+      dubStatus: "Error",
+      dubErrorMessage: "Chưa đồng bộ credit — mở popup để cập nhật.",
+    });
+    return;
+  }
+  if (
+    gate.userHasPaidPlan !== true &&
+    typeof gate.creditMinutes === "number" &&
+    gate.creditMinutes <= 0
+  ) {
+    await chrome.storage.local.set({
+      dubStatus: "Error",
+      dubErrorMessage: "Hết phút credit — nâng cấp hoặc chờ reset đầu tháng.",
+    });
+    return;
+  }
+
   pipelineRunning = true;
   lastPipelineAt = Date.now();
   await chrome.storage.local.set({ dubStatus: "Dubbing..." });

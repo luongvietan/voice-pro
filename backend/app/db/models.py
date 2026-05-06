@@ -21,6 +21,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     jobs: Mapped[list["Job"]] = relationship(back_populates="user")
+    credit_transactions: Mapped[list["CreditTransaction"]] = relationship(back_populates="user")
     credits_row: Mapped["Credits | None"] = relationship(back_populates="user", uselist=False)
     subscriptions: Mapped[list["Subscription"]] = relationship(back_populates="user")
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(back_populates="user")
@@ -36,6 +37,7 @@ class Job(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped["User | None"] = relationship(back_populates="jobs")
+    credit_transactions: Mapped[list["CreditTransaction"]] = relationship(back_populates="job")
 
 
 class Credits(Base):
@@ -49,6 +51,20 @@ class Credits(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="credits_row")
+
+
+class CreditTransaction(Base):
+    __tablename__ = "credit_transactions"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    job_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("jobs.id"), unique=True)
+    delta_minutes: Mapped[int] = mapped_column(Integer)
+    balance_after: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    user: Mapped["User"] = relationship(back_populates="credit_transactions")
+    job: Mapped["Job"] = relationship(back_populates="credit_transactions")
 
 
 class RefreshToken(Base):

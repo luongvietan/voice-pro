@@ -60,6 +60,22 @@ services:
         condition: service_started
     restart: unless-stopped
 
+  beat:
+    image: ${API_IMAGE:-voice-pro-api:latest}
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app.celery_app beat --loglevel=warning
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      SENTRY_DSN: ${SENTRY_DSN}
+      ENVIRONMENT: production
+    depends_on:
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
 volumes:
   vp_pg_prod:
   vp_redis_prod:

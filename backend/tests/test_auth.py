@@ -30,6 +30,7 @@ def test_register_login_me_patch_settings(postgres_live):
     r2 = client.get("/api/v1/users/me", headers={"Authorization": f"Bearer {access}"})
     assert r2.status_code == 200
     assert r2.json()["balance_minutes"] == 10
+    assert r2.json()["is_paid"] is False
     assert r2.json()["settings"] == {}
 
     r3 = client.patch(

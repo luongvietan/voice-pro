@@ -32,3 +32,11 @@ def decode_access_token(token: str, settings: Settings) -> uuid.UUID:
     if not sub:
         raise jwt.InvalidTokenError("missing sub")
     return uuid.UUID(str(sub))
+
+
+def try_decode_access_user_id(token: str, settings: Settings) -> uuid.UUID | None:
+    """Best-effort for rate-limit buckets; returns None if token invalid."""
+    try:
+        return decode_access_token(token, settings)
+    except (jwt.PyJWTError, ValueError):
+        return None

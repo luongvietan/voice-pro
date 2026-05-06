@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import os
 import tempfile
-import uuid
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
-from app.db.models import Job
+from app.db.models import Job, User
 from app.db.session import get_db_session
+from app.deps.auth import get_current_user
 from app.schemas.jobs import JobStatusResponse, SynthesizeRequest, SynthesizeResponse, TranscribeJobResponse
 from app.tasks.synthesize import synthesize_speech_task
 from app.tasks.transcribe import transcribe_file_task
@@ -23,23 +23,39 @@ router = APIRouter(prefix="/jobs")
 def post_transcribe(
     file: UploadFile = File(...),
     db: Session = Depends(get_db_session),
+    user: User = Depends(get_current_user),
 ):
     data = file.file.read()
     fd, path = tempfile.mkstemp(suffix=".webm")
     os.close(fd)
-    with open(path, "wb") as fh:
-        fh.write(data)
+    # P5: clean up temp file if DB operations fail before task dispatch
+    try:
+        with open(path, "wb") as fh:
+            fh.write(data)
 
-    job = Job(status="pending", user_id=None)
-    db.add(job)
-    db.commit()
-    db.refresh(job)
+        job = Job(status="pending", user_id=user.id)
+        db.add(job)
+        db.commit()
+        db.refresh(job)
+    except Exception:
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+        raise
 
     async_result = transcribe_file_task.delay(str(job.id), path, None)
     try:
         out = async_result.get(timeout=600)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # P1: check sentinel return value instead of relying on exception propagation
+    if isinstance(out, dict) and out.get("credit_exhausted"):
+        raise HTTPException(
+            status_code=402,
+            detail={"code": "CREDIT_EXHAUSTED", "message": "Không đủ phút credit cho đoạn audio này."},
+        )
 
     return TranscribeJobResponse(
         job_id=UUID(out["job_id"]),
@@ -53,8 +69,9 @@ def post_transcribe(
 def post_synthesize(
     body: SynthesizeRequest,
     db: Session = Depends(get_db_session),
+    user: User = Depends(get_current_user),
 ):
-    job = Job(status="pending", user_id=None)
+    job = Job(status="pending", user_id=user.id)
     db.add(job)
     db.commit()
     db.refresh(job)
@@ -64,6 +81,13 @@ def post_synthesize(
         out = async_result.get(timeout=600)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    # P16: check credit exhaustion sentinel from synthesize task
+    if isinstance(out, dict) and out.get("credit_exhausted"):
+        raise HTTPException(
+            status_code=402,
+            detail={"code": "CREDIT_EXHAUSTED", "message": "Không đủ phút credit cho đoạn audio này."},
+        )
 
     return SynthesizeResponse(
         job_id=UUID(out["job_id"]),

@@ -6,6 +6,32 @@ import { pullUserSettingsToSync, schedulePushUserSettings } from "../../lib/sett
 
 type TabDubMode = "default" | "on" | "off";
 
+async function confirmFreeTierDubEnable(): Promise<boolean> {
+  const s = await chrome.storage.local.get(["accessToken", "creditMinutes", "userHasPaidPlan"]);
+  if (typeof s.accessToken !== "string" || !s.accessToken) {
+    window.alert("Đăng nhập để dùng dubbing và trừ phút credit.");
+    return false;
+  }
+  if (s.userHasPaidPlan === true) return true;
+  const m = s.creditMinutes;
+  // P12: creditMinutes undefined means storage not yet synced — block and ask user to reopen
+  if (typeof m !== "number") {
+    window.alert("Chưa đồng bộ thông tin credit. Đóng và mở lại popup để thử lại.");
+    return false;
+  }
+  // P7: AC 4.2 requires notification when blocking at 0 minutes
+  if (m <= 0) {
+    window.alert("Hết phút credit. Nâng cấp hoặc chờ reset miễn phí đầu tháng.");
+    return false;
+  }
+  if (m <= 2) {
+    return window.confirm(
+      `Còn ${m} phút — Upgrade để tiếp tục thoải mái. Bật Dub anyway?`,
+    );
+  }
+  return true;
+}
+
 export default function App() {
   const [dubMode, setDubMode] = useState(false);
   const [lang, setLang] = useState("vi");
@@ -104,6 +130,10 @@ export default function App() {
 
   async function persistTabMode(mode: TabDubMode) {
     if (tabId === null) return;
+    if (mode === "on") {
+      const ok = await confirmFreeTierDubEnable();
+      if (!ok) return;
+    }
     const local = await chrome.storage.local.get(["perTabDubOverrides"]);
     const o = { ...((local.perTabDubOverrides ?? {}) as Record<string, boolean>) };
     const key = String(tabId);
@@ -195,8 +225,17 @@ export default function App() {
           checked={dubMode}
           onChange={(e) => {
             const v = e.target.checked;
-            setDubMode(v);
-            void chrome.storage.sync.set({ dubMode: v });
+            if (v) {
+              void confirmFreeTierDubEnable().then((ok) => {
+                if (!ok) return;
+                setDubMode(true);
+                void chrome.storage.sync.set({ dubMode: true });
+                schedulePushUserSettings();
+              });
+              return;
+            }
+            setDubMode(false);
+            void chrome.storage.sync.set({ dubMode: false });
             schedulePushUserSettings();
           }}
         />
@@ -247,11 +286,14 @@ export default function App() {
           <button
             style={{ fontSize: 11, cursor: "pointer", padding: "2px 8px" }}
             onClick={() => {
-              void chrome.storage.local.set({ dubStatus: "Ready", dubErrorMessage: "" });
-              void chrome.storage.sync.set({ dubMode: true });
-              setDubMode(true);
-              setStatus("Ready");
-              setErrorDetail("");
+              void confirmFreeTierDubEnable().then((ok) => {
+                if (!ok) return;
+                void chrome.storage.local.set({ dubStatus: "Ready", dubErrorMessage: "" });
+                void chrome.storage.sync.set({ dubMode: true });
+                setDubMode(true);
+                setStatus("Ready");
+                setErrorDetail("");
+              });
             }}
           >
             Thử lại

@@ -40,7 +40,7 @@ def transcribe_audio(audio_bytes: bytes, language: str | None = None) -> dict[st
     Returns dict: transcript, language_detected, segments (list of dicts).
     """
     if not audio_bytes:
-        return {"transcript": "", "language_detected": "unknown", "segments": []}
+        return {"transcript": "", "language_detected": "unknown", "segments": [], "duration_seconds": 0.0}
 
     suffix = ".webm"
     lower = audio_bytes[:16]
@@ -62,10 +62,12 @@ def transcribe_audio(audio_bytes: bytes, language: str | None = None) -> dict[st
             segments.append({"start": seg.start, "end": seg.end, "text": seg.text})
         transcript = "".join(texts).strip()
         lang = getattr(info, "language", None) or "unknown"
+        duration = float(getattr(info, "duration", 0.0) or 0.0)
         return {
             "transcript": transcript,
             "language_detected": str(lang),
             "segments": segments,
+            "duration_seconds": duration,
         }
     finally:
         try:

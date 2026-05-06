@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings
 from app.db.models import Credits, RefreshToken, User
 from app.security.tokens import create_access_token, hash_refresh_token, new_refresh_token_value
+from app.services.subscription_util import user_has_paid_plan
 
 
 def ensure_credits_row(db: Session, user: User, settings: Settings) -> Credits:
@@ -39,12 +40,14 @@ def build_token_response(
     credits = ensure_credits_row(db, user, settings)
     access = create_access_token(user.id, settings)
     refresh_raw = persist_refresh_token(db, user.id, settings)
+    is_paid = user_has_paid_plan(db, user.id)
     user_payload = {
         "id": user.id,
         "email": user.email,
         "display_name": user.display_name,
         "avatar_url": user.avatar_url,
         "balance_minutes": credits.balance_minutes,
+        "is_paid": is_paid,
     }
     return access, refresh_raw, user_payload
 
