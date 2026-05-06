@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -48,8 +48,8 @@ def test_register_login_me_patch_settings(postgres_live):
 
 def test_google_oauth_creates_user(postgres_live):
     sub = f"google-{uuid.uuid4().hex}"
-    with patch("app.api.auth.fetch_google_userinfo", new_callable=AsyncMock) as m:
-        m.return_value = {"sub": sub, "email": f"{sub}@gmail.com", "name": "Tester", "picture": "https://x/y"}
+    fake_profile = {"sub": sub, "email": f"{sub}@gmail.com", "name": "Tester", "picture": "https://x/y"}
+    with patch("app.api.auth.fetch_google_userinfo", return_value=fake_profile):
         r = client.post("/api/v1/auth/oauth/google", json={"access_token": "fake-google-access-token-xx"})
     assert r.status_code == 200, r.text
     body = r.json()

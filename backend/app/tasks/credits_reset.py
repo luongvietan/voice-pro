@@ -9,9 +9,9 @@ from sqlalchemy.orm import Session
 
 from app.celery_app import celery_app
 from app.config import get_settings
-from app.db.models import Credits, Subscription
+from app.db.models import Credits
 from app.db.session import get_session_factory
-from app.services.subscription_util import _PAID_PLANS
+from app.services.subscription_util import select_user_ids_with_paid_subscription
 
 logger = logging.getLogger(__name__)
 
@@ -23,19 +23,10 @@ def reset_free_tier_monthly() -> dict[str, int]:
     factory = get_session_factory()
     session: Session = factory()
     try:
-        # P9+P6: single bulk UPDATE instead of N+1 loop, atomic at DB level to
-        # avoid lost-update race with concurrent credit deductions
-        paid_user_subquery = (
-            select(Subscription.user_id)
-            .where(
-                Subscription.status == "active",
-                Subscription.plan.in_(_PAID_PLANS),
-            )
-            .subquery()
-        )
+        paid_sq = select_user_ids_with_paid_subscription().subquery()
         result = session.execute(
             update(Credits)
-            .where(Credits.user_id.not_in(select(paid_user_subquery.c.user_id)))
+            .where(Credits.user_id.not_in(select(paid_sq.c.user_id)))
             .values(balance_minutes=settings.initial_free_minutes)
             .execution_options(synchronize_session=False)
         )

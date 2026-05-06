@@ -16,6 +16,15 @@ Tài liệu này mô tả **các bước và lệnh cần chạy mỗi lần** l
 ```env
 DATABASE_URL=postgresql+psycopg2://voicepro:voicepro@127.0.0.1:5434/voicepro
 REDIS_URL=redis://127.0.0.1:6380/0
+
+# Stripe (Epic 6 — tùy chọn cho webhook/checkout)
+# STRIPE_API_KEY=sk_test_...
+# STRIPE_WEBHOOK_SECRET=whsec_...
+# STRIPE_PAID_PRICE_IDS=price_xxx,price_yyy
+# STRIPE_PRICE_BASIC=price_basic
+# STRIPE_PRICE_PRO=price_pro
+# STRIPE_SUCCESS_URL=http://localhost:5173/?checkout=success
+# STRIPE_CANCEL_URL=http://localhost:5173/?checkout=cancel
 ```
 
 Đổi **port Postgres** (5434) hoặc **port Redis** (6380) nếu máy bạn khác.

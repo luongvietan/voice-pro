@@ -18,6 +18,7 @@ class User(Base):
     display_name: Mapped[str | None] = mapped_column(String(255))
     avatar_url: Mapped[str | None] = mapped_column(String(2048))
     settings_json: Mapped[dict | None] = mapped_column(JSONB)
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     jobs: Mapped[list["Job"]] = relationship(back_populates="user")
@@ -86,7 +87,18 @@ class Subscription(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), index=True)
     plan: Mapped[str] = mapped_column(String(64), default="free")
     stripe_customer_id: Mapped[str | None] = mapped_column(String(255))
+    stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
+    stripe_price_id: Mapped[str | None] = mapped_column(String(255))
     status: Mapped[str] = mapped_column(String(32), default="active")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     user: Mapped["User"] = relationship(back_populates="subscriptions")
+
+
+class StripeWebhookEvent(Base):
+    """Dedupe Stripe webhook deliveries (same event id may be retried)."""
+
+    __tablename__ = "stripe_webhook_events"
+
+    event_id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

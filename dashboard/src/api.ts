@@ -55,3 +55,27 @@ export async function logoutDashboard(): Promise<void> {
   }).catch(() => undefined);
   clearStoredAccessToken();
 }
+
+export async function createCheckoutSession(): Promise<string> {
+  const token = getStoredAccessToken();
+  if (!token) throw new Error("Chưa đăng nhập");
+  const res = await fetch(`${API_BASE}/api/v1/billing/stripe/checkout-session`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await extractErrorMessage(res));
+  const data = (await res.json()) as { url: string };
+  return data.url;
+}
+
+export async function createBillingPortalSession(): Promise<string> {
+  const token = getStoredAccessToken();
+  if (!token) throw new Error("Chưa đăng nhập");
+  const res = await fetch(`${API_BASE}/api/v1/billing/stripe/portal-session`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(await extractErrorMessage(res));
+  const data = (await res.json()) as { url: string };
+  return data.url;
+}
