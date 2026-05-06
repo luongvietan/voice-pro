@@ -1,6 +1,9 @@
 /** Dev API — đặt qua chrome.storage.local key apiBaseUrl nếu cần. */
 export const DEFAULT_API_BASE = "http://localhost:8000";
 
+/** Alarm SW — retry `pullUserSettingsToSync` sau login offline (Epic 5.2). */
+export const VP_SETTINGS_PULL_RETRY_ALARM = "vp-settings-pull-retry";
+
 export type PopupStatus = "Ready" | "Dubbing..." | "Capturing..." | "Error";
 
 export const LANG_OPTIONS: { code: string; label: string }[] = [

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { LANG_OPTIONS } from "../../constants";
 import { signInWithGoogle, signOut } from "../../lib/auth";
@@ -6,31 +6,12 @@ import { pullUserSettingsToSync, schedulePushUserSettings } from "../../lib/sett
 
 type TabDubMode = "default" | "on" | "off";
 
-async function confirmFreeTierDubEnable(): Promise<boolean> {
-  const s = await chrome.storage.local.get(["accessToken", "creditMinutes", "userHasPaidPlan"]);
-  if (typeof s.accessToken !== "string" || !s.accessToken) {
-    window.alert("Đăng nhập để dùng dubbing và trừ phút credit.");
-    return false;
-  }
-  if (s.userHasPaidPlan === true) return true;
-  const m = s.creditMinutes;
-  // P12: creditMinutes undefined means storage not yet synced — block and ask user to reopen
-  if (typeof m !== "number") {
-    window.alert("Chưa đồng bộ thông tin credit. Đóng và mở lại popup để thử lại.");
-    return false;
-  }
-  // P7: AC 4.2 requires notification when blocking at 0 minutes
-  if (m <= 0) {
-    window.alert("Hết phút credit. Nâng cấp hoặc chờ reset miễn phí đầu tháng.");
-    return false;
-  }
-  if (m <= 2) {
-    return window.confirm(
-      `Còn ${m} phút — Upgrade để tiếp tục thoải mái. Bật Dub anyway?`,
-    );
-  }
-  return true;
-}
+type GatePrompt =
+  | null
+  | { kind: "login"; message: string }
+  | { kind: "sync"; message: string }
+  | { kind: "exhausted"; message: string }
+  | { kind: "lowCredit"; minutes: number };
 
 export default function App() {
   const [dubMode, setDubMode] = useState(false);
@@ -48,6 +29,67 @@ export default function App() {
 
   const [tabId, setTabId] = useState<number | null>(null);
   const [tabMode, setTabMode] = useState<TabDubMode>("default");
+
+  const [gatePrompt, setGatePrompt] = useState<GatePrompt>(null);
+  const gateResolverRef = useRef<((value: boolean) => void) | null>(null);
+
+  const resolveGate = useCallback((value: boolean) => {
+    const r = gateResolverRef.current;
+    gateResolverRef.current = null;
+    setGatePrompt(null);
+    r?.(value);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      const r = gateResolverRef.current;
+      if (r !== null) {
+        gateResolverRef.current = null;
+        r(false);
+      }
+    };
+  }, []);
+
+  const confirmFreeTierDubEnable = useCallback(async (): Promise<boolean> => {
+    if (gateResolverRef.current !== null) return false;
+    const s = await chrome.storage.local.get(["accessToken", "creditMinutes", "userHasPaidPlan"]);
+    if (typeof s.accessToken !== "string" || !s.accessToken) {
+      return await new Promise((resolve) => {
+        gateResolverRef.current = resolve;
+        setGatePrompt({
+          kind: "login",
+          message: "Đăng nhập để dùng dubbing và trừ phút credit.",
+        });
+      });
+    }
+    if (s.userHasPaidPlan === true) return true;
+    const m = s.creditMinutes;
+    if (typeof m !== "number") {
+      return await new Promise((resolve) => {
+        gateResolverRef.current = resolve;
+        setGatePrompt({
+          kind: "sync",
+          message: "Chưa đồng bộ thông tin credit. Đóng và mở lại popup để thử lại.",
+        });
+      });
+    }
+    if (m <= 0) {
+      return await new Promise((resolve) => {
+        gateResolverRef.current = resolve;
+        setGatePrompt({
+          kind: "exhausted",
+          message: "Hết phút credit. Nâng cấp hoặc chờ reset miễn phí đầu tháng.",
+        });
+      });
+    }
+    if (m <= 2) {
+      return await new Promise((resolve) => {
+        gateResolverRef.current = resolve;
+        setGatePrompt({ kind: "lowCredit", minutes: m });
+      });
+    }
+    return true;
+  }, []);
 
   const loadTabOverride = useCallback(async (id: number | null) => {
     if (id === null) return;
@@ -80,6 +122,17 @@ export default function App() {
       void loadTabOverride(id ?? null);
     });
   }, [loadTabOverride]);
+
+  /** Epic 5.2: khi browser online, báo SW thử lại pull nếu đang pending. */
+  useEffect(() => {
+    const onOnline = () => {
+      void chrome.runtime
+        .sendMessage({ type: "VP_WAKE_SETTINGS_PULL_RETRY" })
+        .catch(() => undefined);
+    };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, []);
 
   useEffect(() => {
     chrome.storage.sync.get(["dubMode", "dubTargetLang"], (s) => {
@@ -147,6 +200,46 @@ export default function App() {
     <div style={{ padding: 12, fontFamily: "system-ui", minWidth: 280 }}>
       <h1 style={{ fontSize: 14, margin: "0 0 8px" }}>Voice-Pro Dub</h1>
 
+      {gatePrompt ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            marginBottom: 12,
+            padding: 10,
+            borderRadius: 6,
+            border: "1px solid #ccc",
+            background: "#fafafa",
+            fontSize: 12,
+          }}
+        >
+          {gatePrompt.kind === "lowCredit" ? (
+            <>
+              <div style={{ marginBottom: 8 }}>
+                Còn {gatePrompt.minutes} phút — Upgrade để tiếp tục thoải mái. Bật Dub anyway?
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <button type="button" style={{ fontSize: 11, cursor: "pointer" }} onClick={() => resolveGate(false)}>
+                  Hủy
+                </button>
+                <button type="button" style={{ fontSize: 11, cursor: "pointer" }} onClick={() => resolveGate(true)}>
+                  Tiếp tục
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ marginBottom: 8 }}>{gatePrompt.message}</div>
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button type="button" style={{ fontSize: 11, cursor: "pointer" }} onClick={() => resolveGate(false)}>
+                  OK
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
+
       {!signedIn ? (
         <div style={{ marginBottom: 12 }}>
           <button
@@ -160,7 +253,16 @@ export default function App() {
                 .then(async () => {
                   const { accessToken } = await chrome.storage.local.get("accessToken");
                   if (typeof accessToken === "string") {
-                    await pullUserSettingsToSync(accessToken);
+                    const pulled = await pullUserSettingsToSync(accessToken);
+                    if (!pulled) {
+                      await chrome.storage.local.set({
+                        vpSettingsPullRetryActive: true,
+                        vpSettingsPullRetryAttempts: 0,
+                      });
+                      void chrome.runtime
+                        .sendMessage({ type: "VP_START_SETTINGS_PULL_RETRY" })
+                        .catch(() => undefined);
+                    }
                   }
                   setSignedIn(true);
                   chrome.storage.local.get(["userDisplayName", "userEmail", "userAvatarUrl", "creditMinutes"], (s) => {

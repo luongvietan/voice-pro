@@ -59,8 +59,7 @@ async function recordTabAudio(ms: number): Promise<Blob> {
   });
 }
 
-function duckOriginalVideo(active: boolean) {
-  const v = getVideo();
+function duckOriginalVideoOnElement(active: boolean, v: HTMLVideoElement | null) {
   if (!v) return;
   if (active) {
     if (v.dataset.dubPrevVolume === undefined) {
@@ -73,13 +72,45 @@ function duckOriginalVideo(active: boolean) {
   }
 }
 
-function playDubBase64(audioBase64: string, mimeType: string) {
-  const url = `data:${mimeType};base64,${audioBase64}`;
+function duckOriginalVideo(active: boolean) {
+  duckOriginalVideoOnElement(active, getVideo());
+}
+
+/** Gỡ listener đồng bộ dub ↔ video (Epic 5.4 — tránh orphan trên element cũ). */
+let dubSyncCleanups: Array<() => void> = [];
+
+function clearDubVideoSyncListeners(): void {
+  for (const c of dubSyncCleanups) {
+    try {
+      c();
+    } catch {
+      /* ignore */
+    }
+  }
+  dubSyncCleanups = [];
+}
+
+function stopDubAudioElement(): void {
   const prev = window.dubAudioEl;
   if (prev) {
     prev.pause();
-    prev.src = "";
+    prev.removeAttribute("src");
+    prev.load();
   }
+  window.dubAudioEl = undefined;
+}
+
+function teardownDubForSpaNavigation(previousVideoEl: HTMLVideoElement | null): void {
+  clearDubVideoSyncListeners();
+  duckOriginalVideoOnElement(false, previousVideoEl);
+  stopDubAudioElement();
+}
+
+function playDubBase64(audioBase64: string, mimeType: string) {
+  clearDubVideoSyncListeners();
+  stopDubAudioElement();
+
+  const url = `data:${mimeType};base64,${audioBase64}`;
   const audio = new Audio(url);
   window.dubAudioEl = audio;
   const v = getVideo();
@@ -92,13 +123,23 @@ function playDubBase64(audioBase64: string, mimeType: string) {
         }
       }
     };
-    v.addEventListener("play", () => void audio.play().catch(() => undefined));
-    v.addEventListener("pause", () => audio.pause());
-    v.addEventListener("seeking", () => {
+    const onPlay = () => void audio.play().catch(() => undefined);
+    const onPause = () => audio.pause();
+    const onSeeking = () => {
       audio.currentTime = v.currentTime;
-    });
+    };
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    v.addEventListener("seeking", onSeeking);
     v.addEventListener("timeupdate", sync);
     audio.addEventListener("timeupdate", sync);
+    dubSyncCleanups.push(() => {
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+      v.removeEventListener("seeking", onSeeking);
+      v.removeEventListener("timeupdate", sync);
+      audio.removeEventListener("timeupdate", sync);
+    });
   }
   void audio.play().catch(() => undefined);
 }
@@ -130,7 +171,8 @@ let pipelineRunning = false;
 let lastPipelineAt = 0;
 const PIPELINE_DEBOUNCE_MS = 45_000;
 
-const attachedVideos = new WeakSet<HTMLVideoElement>();
+/** `Set` thay `WeakSet` để có thể `delete` khi SPA đổi `<video>` (Epic 5.4). */
+const attachedVideos = new Set<HTMLVideoElement>();
 
 async function maybeRunPipeline() {
   if (!(await isDubEnabledForThisTab()) || pipelineRunning) return;
@@ -188,6 +230,31 @@ async function maybeRunPipeline() {
 export default defineContentScript({
   matches: ["*://www.youtube.com/*", "*://youtube.com/*", "*://m.youtube.com/*"],
   main() {
+    let previousVideo: HTMLVideoElement | null = null;
+
+    const onPossibleVideoSwap = () => {
+      const v = getVideo();
+      if (v === previousVideo) return;
+      if (previousVideo !== null) {
+        attachedVideos.delete(previousVideo);
+        teardownDubForSpaNavigation(previousVideo);
+      }
+      previousVideo = v;
+      if (v) attachToVideo(v);
+    };
+
+    try {
+      document.addEventListener(
+        "yt-navigate-finish",
+        () => {
+          onPossibleVideoSwap();
+        },
+        true,
+      );
+    } catch {
+      /* feature-detect: một số build không có custom event */
+    }
+
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === "sync" && changes.dubMode?.newValue === false) {
         void isDubEnabledForThisTab().then((on) => {
@@ -233,14 +300,10 @@ export default defineContentScript({
     };
 
     const obs = new MutationObserver(() => {
-      const v = getVideo();
-      if (v) {
-        attachToVideo(v);
-      }
+      onPossibleVideoSwap();
     });
     obs.observe(document.documentElement, { childList: true, subtree: true });
 
-    const existing = getVideo();
-    if (existing) attachToVideo(existing);
+    onPossibleVideoSwap();
   },
 });
