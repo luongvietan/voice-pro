@@ -1,0 +1,19 @@
+{
+  "name": "voice-pro",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "spawn-sync"]
+  },
+  "scripts": {
+    "dev:extension": "pnpm --filter extension dev",
+    "dev:dashboard": "pnpm --filter dashboard dev",
+    "dev:landing": "pnpm --filter landing dev",
+    "dev:backend": "cd backend && uvicorn main:app --reload --port 8000",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r --if-present run lint"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

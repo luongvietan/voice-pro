@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: voicepro
+      POSTGRES_PASSWORD: voicepro
+      POSTGRES_DB: voicepro
+    ports:
+      - "5432:5432"
+    volumes:
+      - vp_pg_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U voicepro -d voicepro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+      # Mount Voice-Pro legacy codebase so backend can `import app.abus_*`
+      - .:/voice_pro_root
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://voicepro:voicepro@postgres:5432/voicepro
+      REDIS_URL: redis://redis:6379/0
+      CORS_ORIGINS: http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000
+      # /voice_pro_root = repo root → `import app.abus_*` works
+      PYTHONPATH: /app:/voice_pro_root
+      VOICE_PRO_ROOT: /voice_pro_root
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app.celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      # Same mounts so Celery tasks can call Whisper/Edge-TTS directly
+      - .:/voice_pro_root
+    environment:
+      DATABASE_URL: postgresql+psycopg2://voicepro:voicepro@postgres:5432/voicepro
+      REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app:/voice_pro_root
+      VOICE_PRO_ROOT: /voice_pro_root
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+volumes:
+  vp_pg_dev:
