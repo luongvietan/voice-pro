@@ -1,4 +1,4 @@
-import { transcribeThenSynthesize } from "../lib/apiPipeline";
+import { transcribeThenSynthesize, refreshCreditMinutes } from "../lib/apiPipeline";
 
 declare global {
   interface Window {
@@ -103,6 +103,29 @@ function playDubBase64(audioBase64: string, mimeType: string) {
   void audio.play().catch(() => undefined);
 }
 
+async function isDubEnabledForThisTab(): Promise<boolean> {
+  let tabId: number | undefined;
+  try {
+    const tabRes = (await chrome.runtime.sendMessage({ type: "GET_TAB_ID" })) as { tabId?: number };
+    tabId = tabRes.tabId;
+  } catch {
+    // Service worker terminated — fall back to global dubMode
+    const sync = await chrome.storage.sync.get("dubMode");
+    return sync.dubMode === true;
+  }
+  if (tabId === undefined) return false;
+
+  const local = await chrome.storage.local.get(["perTabDubOverrides"]);
+  const overrides = (local.perTabDubOverrides ?? {}) as Record<string, boolean>;
+  const key = String(tabId);
+  if (Object.prototype.hasOwnProperty.call(overrides, key)) {
+    return overrides[key]!;
+  }
+
+  const sync = await chrome.storage.sync.get("dubMode");
+  return sync.dubMode === true;
+}
+
 let pipelineRunning = false;
 let lastPipelineAt = 0;
 const PIPELINE_DEBOUNCE_MS = 45_000;
@@ -110,8 +133,7 @@ const PIPELINE_DEBOUNCE_MS = 45_000;
 const attachedVideos = new WeakSet<HTMLVideoElement>();
 
 async function maybeRunPipeline() {
-  const { dubMode } = await chrome.storage.sync.get("dubMode");
-  if (!dubMode || pipelineRunning) return;
+  if (!(await isDubEnabledForThisTab()) || pipelineRunning) return;
   if (Date.now() - lastPipelineAt < PIPELINE_DEBOUNCE_MS) return;
   const v = getVideo();
   if (!v) return;
@@ -126,6 +148,7 @@ async function maybeRunPipeline() {
     const { audioBase64 } = await transcribeThenSynthesize(blob);
     playDubBase64(audioBase64, "audio/mpeg");
     await chrome.storage.local.set({ dubStatus: "Ready", dubErrorMessage: "" });
+    void refreshCreditMinutes();
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     await chrome.storage.local.set({ dubStatus: "Error", dubErrorMessage: msg });
@@ -138,10 +161,21 @@ export default defineContentScript({
   matches: ["*://www.youtube.com/*", "*://youtube.com/*", "*://m.youtube.com/*"],
   main() {
     chrome.storage.onChanged.addListener((changes, area) => {
-      if (area !== "sync") return;
-      if (changes.dubMode?.newValue === false) {
-        duckOriginalVideo(false);
-        window.dubAudioEl?.pause();
+      if (area === "sync" && changes.dubMode?.newValue === false) {
+        void isDubEnabledForThisTab().then((on) => {
+          if (!on) {
+            duckOriginalVideo(false);
+            window.dubAudioEl?.pause();
+          }
+        });
+      }
+      if (area === "local" && changes.perTabDubOverrides) {
+        void isDubEnabledForThisTab().then((on) => {
+          if (!on) {
+            duckOriginalVideo(false);
+            window.dubAudioEl?.pause();
+          }
+        });
       }
     });
 

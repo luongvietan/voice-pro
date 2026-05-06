@@ -1,5 +1,10 @@
 export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg?.type === "GET_TAB_ID") {
+      const tabId = sender.tab?.id;
+      sendResponse({ tabId });
+      return true;
+    }
     if (msg?.type === "GET_TAB_AUDIO_STREAM_ID") {
       const tabId = sender.tab?.id;
       if (tabId === undefined) {

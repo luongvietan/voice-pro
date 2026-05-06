@@ -1,8 +1,18 @@
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
+import HomePage from "./Home";
+import LoginPage from "./Login";
+import RegisterPage from "./Register";
+
 export default function App() {
   return (
-    <main style={{ fontFamily: "system-ui", padding: 24 }}>
-      <h1>Voice-Pro Dashboard</h1>
-      <p>SPA scaffold (Epic 1)</p>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

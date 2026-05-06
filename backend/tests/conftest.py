@@ -1,9 +1,17 @@
 import pytest
+from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 
-from app.celery_app import celery_app
 
+@pytest.fixture(scope="session")
+def postgres_live():
+    """Bỏ qua test cần DB khi PostgreSQL chưa chạy (vd. chưa `docker compose up postgres`)."""
+    from app.db.session import get_engine
 
-@pytest.fixture(scope="session", autouse=True)
-def _celery_eager():
-    celery_app.conf.task_always_eager = True
-    celery_app.conf.task_eager_propagates = True
+    try:
+        eng = get_engine()
+        with eng.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except OperationalError as exc:
+        pytest.skip(f"PostgreSQL không khả dụng: {exc}")
+    return True
