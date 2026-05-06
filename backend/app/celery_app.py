@@ -9,7 +9,7 @@ celery_app = Celery(
     "voice_pro",
     broker=_redis,
     backend=_redis,
-    include=["app.tasks.ping"],
+    include=["app.tasks.ping", "app.tasks.transcribe", "app.tasks.synthesize"],
 )
 
 celery_app.conf.update(

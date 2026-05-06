@@ -8,6 +8,7 @@ import sentry_sdk
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 
 from app.api.health import router as health_router
+from app.api.jobs import router as jobs_router
 from app.config import get_settings
 
 
@@ -36,12 +37,14 @@ def create_app() -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins_list,
+        allow_origin_regex=r"chrome-extension://[\w-]+",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
     application.include_router(health_router, tags=["health"])
+    application.include_router(jobs_router, prefix="/api/v1")
 
     return application
 

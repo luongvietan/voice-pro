@@ -1,40 +1,74 @@
 """
-Speech-to-Text adapter (Epic 2).
-Wraps `app.abus_asr_faster_whisper` from Voice-Pro legacy codebase.
-
-Requires PYTHONPATH to include repo root so `import app.xxx` resolves.
+Speech-to-Text via Faster-Whisper (Epic 2).
 """
 
 from __future__ import annotations
 
-import importlib
 import logging
+import os
+import tempfile
+import threading
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
-_FASTER_WHISPER_MODULE = "app.abus_asr_faster_whisper"
+_MODEL_ENV = "WHISPER_MODEL"
+_DEFAULT_MODEL = "tiny"
+
+_whisper_model = None
+_model_lock = threading.Lock()
 
 
-def _lazy_import(module_path: str) -> Any:
-    """Import legacy module lazily — raises clear error if PYTHONPATH not set."""
-    try:
-        return importlib.import_module(module_path)
-    except ModuleNotFoundError as exc:
-        raise RuntimeError(
-            f"Cannot import '{module_path}'. "
-            "Ensure PYTHONPATH includes the Voice-Pro repo root. "
-            f"Original error: {exc}"
-        ) from exc
+def _get_whisper_model():
+    global _whisper_model
+    if _whisper_model is None:
+        with _model_lock:
+            if _whisper_model is None:
+                from faster_whisper import WhisperModel
+
+                name = os.environ.get(_MODEL_ENV, _DEFAULT_MODEL)
+                device = os.environ.get("WHISPER_DEVICE", "cpu")
+                ctype = os.environ.get("WHISPER_COMPUTE_TYPE", "int8")
+                _whisper_model = WhisperModel(name, device=device, compute_type=ctype)
+                logger.info("Loaded Whisper model %s (%s)", name, device)
+    return _whisper_model
 
 
 def transcribe_audio(audio_bytes: bytes, language: str | None = None) -> dict[str, Any]:
     """
-    Transcribe PCM audio bytes using Faster-Whisper.
-
-    Returns dict: {"transcript": str, "segments": list, "language_detected": str}
-    This is a stub — implement in Epic 2 Story 2.3.
+    Transcribe audio (WebM/MP3/WAV bytes). Faster-Whisper reads via ffmpeg internally.
+    Returns dict: transcript, language_detected, segments (list of dicts).
     """
-    raise NotImplementedError(
-        "STT adapter is a stub. Implement in Epic 2 / Story 2.3 using _lazy_import()."
-    )
+    if not audio_bytes:
+        return {"transcript": "", "language_detected": "unknown", "segments": []}
+
+    suffix = ".webm"
+    lower = audio_bytes[:16]
+    if lower.startswith(b"RIFF"):
+        suffix = ".wav"
+
+    fd, path = tempfile.mkstemp(suffix=suffix)
+    os.close(fd)
+    try:
+        with open(path, "wb") as out:
+            out.write(audio_bytes)
+
+        model = _get_whisper_model()
+        segments_iter, info = model.transcribe(path, language=language)
+        segments: list[dict[str, Any]] = []
+        texts: list[str] = []
+        for seg in segments_iter:
+            texts.append(seg.text)
+            segments.append({"start": seg.start, "end": seg.end, "text": seg.text})
+        transcript = "".join(texts).strip()
+        lang = getattr(info, "language", None) or "unknown"
+        return {
+            "transcript": transcript,
+            "language_detected": str(lang),
+            "segments": segments,
+        }
+    finally:
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
