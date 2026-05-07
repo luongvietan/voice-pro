@@ -24,6 +24,17 @@ class Settings(BaseSettings):
     refresh_cookie_name: str = Field(default="refresh_token", alias="REFRESH_COOKIE_NAME")
     initial_free_minutes: int = Field(default=10, alias="INITIAL_FREE_MINUTES")
 
+    translate_timeout_seconds: float = Field(
+        default=120.0,
+        alias="TRANSLATE_TIMEOUT_SECONDS",
+        description="Timeout cho bước dịch trong synthesize (deep-translator / HTTP).",
+    )
+    tts_timeout_seconds: float = Field(
+        default=120.0,
+        alias="TTS_TIMEOUT_SECONDS",
+        description="Timeout cho Edge-TTS trong synthesize.",
+    )
+
     stripe_api_key: str | None = Field(default=None, alias="STRIPE_API_KEY")
     stripe_webhook_secret: str | None = Field(default=None, alias="STRIPE_WEBHOOK_SECRET")
     stripe_paid_price_ids: str = Field(

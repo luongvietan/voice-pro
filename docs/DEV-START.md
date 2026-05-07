@@ -168,6 +168,12 @@ Load unpacked: Chrome → **Extensions** → **Load unpacked** → chọn thư m
 
 ---
 
+## Docker image backend (production)
+
+Image build từ `backend/Dockerfile` chạy process dưới user **`appuser`** (non-root). Khi bind-mount volume vào container, đảm bảo file trên host có quyền phù hợp hoặc tránh mount ghi vào path chỉ root mới ghi được.
+
+---
+
 ## Tóm tắt lệnh copy-paste (4 terminal)
 
 **Terminal A — Redis (nếu container stopped)**

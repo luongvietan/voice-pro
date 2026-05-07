@@ -168,15 +168,22 @@ async function isDubEnabledForThisTab(): Promise<boolean> {
 }
 
 let pipelineRunning = false;
-let lastPipelineAt = 0;
-const PIPELINE_DEBOUNCE_MS = 45_000;
+/** Thời điểm pipeline **hoàn tất** (success/error) lần trước — dùng cho cooldown (Epic 8.1). */
+let lastPipelineCompletedAt = 0;
+/**
+ * Cooldown sau khi pipeline xong trước khi chạy lại.
+ * Baseline cũ: 45s kể từ **lần bắt đầu** → tần suất tối đa ~80 req/h/giả định luôn fire.
+ * Chiến lược: debounce theo **completion** + 23s → gap sau chunk ngắn hơn; tần suất tối đa ~156 req/h
+ * khi pipeline tức thì (vẫn < 2× baseline 80).
+ */
+const PIPELINE_DEBOUNCE_AFTER_COMPLETE_MS = 23_000;
 
 /** `Set` thay `WeakSet` để có thể `delete` khi SPA đổi `<video>` (Epic 5.4). */
 const attachedVideos = new Set<HTMLVideoElement>();
 
 async function maybeRunPipeline() {
   if (!(await isDubEnabledForThisTab()) || pipelineRunning) return;
-  if (Date.now() - lastPipelineAt < PIPELINE_DEBOUNCE_MS) return;
+  if (Date.now() - lastPipelineCompletedAt < PIPELINE_DEBOUNCE_AFTER_COMPLETE_MS) return;
   const v = getVideo();
   if (!v) return;
 
@@ -209,7 +216,6 @@ async function maybeRunPipeline() {
   }
 
   pipelineRunning = true;
-  lastPipelineAt = Date.now();
   await chrome.storage.local.set({ dubStatus: "Dubbing..." });
   duckOriginalVideo(true);
 
@@ -224,6 +230,7 @@ async function maybeRunPipeline() {
     await chrome.storage.local.set({ dubStatus: "Error", dubErrorMessage: msg });
   } finally {
     pipelineRunning = false;
+    lastPipelineCompletedAt = Date.now();
   }
 }
 

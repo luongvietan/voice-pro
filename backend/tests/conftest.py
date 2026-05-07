@@ -29,6 +29,15 @@ def _reset_redis_singleton():
     reset_redis_client_for_tests()
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limit_fail_open_throttle():
+    from app.middleware.rate_limit import reset_rate_limit_fail_open_log_throttle_for_tests
+
+    reset_rate_limit_fail_open_log_throttle_for_tests()
+    yield
+    reset_rate_limit_fail_open_log_throttle_for_tests()
+
+
 @pytest.fixture(scope="session")
 def postgres_live():
     """Bỏ qua test cần DB khi PostgreSQL chưa chạy (vd. chưa `docker compose up postgres`)."""

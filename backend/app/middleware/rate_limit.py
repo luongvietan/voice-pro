@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from typing import Callable
 
 import redis.asyncio as aioredis
@@ -15,6 +16,25 @@ from app.redis_client import get_redis
 from app.security.tokens import try_decode_access_user_id
 
 logger = logging.getLogger(__name__)
+
+_FAIL_OPEN_LOG_INTERVAL_SEC = 60.0
+_last_fail_open_log_mono: float | None = None
+
+
+def reset_rate_limit_fail_open_log_throttle_for_tests() -> None:
+    """pytest: reset throttle giữa các test."""
+    global _last_fail_open_log_mono
+    _last_fail_open_log_mono = None
+
+
+def _log_redis_fail_open_throttled(reason: str) -> None:
+    """ERROR có prefix cố định; tối đa 1 log / 60s mỗi process (Epic 9.3)."""
+    global _last_fail_open_log_mono
+    now = time.monotonic()
+    if _last_fail_open_log_mono is not None and (now - _last_fail_open_log_mono) < _FAIL_OPEN_LOG_INTERVAL_SEC:
+        return
+    _last_fail_open_log_mono = now
+    logger.error("[rate_limit] redis_unavailable_fail_open %s", reason)
 
 
 def _client_ip(request: Request) -> str | None:
@@ -47,6 +67,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # P3: use async Redis client to avoid blocking the event loop
         r = await get_redis()
         if r is None:
+            _log_redis_fail_open_throttled("get_redis_returned_none")
             return await call_next(request)
 
         # P13: if client IP is unknown, skip rate limiting rather than sharing a
@@ -106,7 +127,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         except aioredis.RedisError:
             # P15: Redis error mid-dispatch — fail open so the API stays available
-            logger.error("RateLimitMiddleware Redis error, failing open")
+            _log_redis_fail_open_throttled("redis_error_mid_dispatch")
             return await call_next(request)
 
         return await call_next(request)

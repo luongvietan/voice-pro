@@ -5,11 +5,8 @@ Text-to-Speech via Edge-TTS (Epic 2).
 from __future__ import annotations
 
 import asyncio
-import logging
 import os
 import tempfile
-
-logger = logging.getLogger(__name__)
 
 # Primary neural voices per language prefix
 _VOICE_BY_LANG: dict[str, str] = {
@@ -36,14 +33,18 @@ def _voice_for_language(language: str) -> str:
     return _VOICE_BY_LANG["en"]
 
 
-async def _save_mp3(text: str, voice: str) -> bytes:
+async def _save_mp3(text: str, voice: str, timeout_seconds: float) -> bytes:
     import edge_tts
 
     communicate = edge_tts.Communicate(text, voice)
     fd, path = tempfile.mkstemp(suffix=".mp3")
     os.close(fd)
     try:
-        await communicate.save(path)
+
+        async def _save() -> None:
+            await communicate.save(path)
+
+        await asyncio.wait_for(_save(), timeout=timeout_seconds)
         with open(path, "rb") as f:
             return f.read()
     finally:
@@ -53,7 +54,13 @@ async def _save_mp3(text: str, voice: str) -> bytes:
             pass
 
 
-def synthesize(text: str, language: str, voice: str | None = None) -> bytes:
-    """Synthesize MP3 bytes."""
+def synthesize(
+    text: str,
+    language: str,
+    voice: str | None = None,
+    *,
+    timeout_seconds: float = 120.0,
+) -> bytes:
+    """Tổng hợp MP3; ``timeout_seconds`` giới hạn thời gian chờ Edge-TTS (Epic 8.3)."""
     v = voice or _voice_for_language(language)
-    return asyncio.run(_save_mp3(text, v))
+    return asyncio.run(_save_mp3(text, v, timeout_seconds))

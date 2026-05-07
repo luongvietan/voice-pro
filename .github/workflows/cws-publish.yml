@@ -1,0 +1,68 @@
+# Epic 9.2 — build extension zip khi push tag release/*; publish CWS nếu đã cấu hình secrets.
+name: Chrome Web Store release
+
+on:
+  push:
+    tags:
+      - "release/**"
+
+jobs:
+  build-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - run: pnpm install
+
+      - name: Build extension (WXT)
+        run: pnpm --filter extension build
+
+      - name: Zip chrome-mv3 package
+        working-directory: extension
+        run: cd .output && zip -r ../../voice-pro-extension.zip chrome-mv3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voice-pro-extension-zip
+          path: voice-pro-extension.zip
+
+  publish-cws:
+    needs: build-extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: voice-pro-extension-zip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Publish lên Chrome Web Store (tùy secrets)
+        env:
+          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+        run: |
+          set -e
+          if [ -z "${CWS_REFRESH_TOKEN:-}" ] || [ -z "${CWS_CLIENT_ID:-}" ] || [ -z "${CWS_CLIENT_SECRET:-}" ] || [ -z "${CWS_EXTENSION_ID:-}" ]; then
+            echo "::notice::Bỏ qua publish CWS — thiếu một hoặc nhiều GitHub Secrets (CWS_REFRESH_TOKEN, CWS_CLIENT_ID, CWS_CLIENT_SECRET, CWS_EXTENSION_ID). Artifact zip vẫn được tạo ở job build."
+            exit 0
+          fi
+          npx --yes chrome-webstore-upload-cli@3 upload \
+            --source voice-pro-extension-zip/voice-pro-extension.zip \
+            --extension-id "$CWS_EXTENSION_ID" \
+            --client-id "$CWS_CLIENT_ID" \
+            --client-secret "$CWS_CLIENT_SECRET" \
+            --refresh-token "$CWS_REFRESH_TOKEN" \
+            --auto-publish
