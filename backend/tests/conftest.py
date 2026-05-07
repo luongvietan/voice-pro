@@ -5,6 +5,23 @@ from sqlalchemy.exc import OperationalError
 from app.redis_client import reset_redis_client_for_tests
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _clear_rate_limit_keys_session():
+    """Xóa bucket rate-limit cũ trong Redis để full suite không dính 429/block từ lần chạy trước."""
+    try:
+        import redis
+
+        from app.config import get_settings
+
+        r = redis.Redis.from_url(get_settings().redis_url, decode_responses=True)
+        for key in r.scan_iter(match="vp:rl:*"):
+            r.delete(key)
+        r.close()
+    except Exception:
+        pass
+    yield
+
+
 @pytest.fixture(autouse=True)
 def _reset_redis_singleton():
     """TestClient có thể đóng loop giữa các test — tránh giữ Redis async client cũ."""

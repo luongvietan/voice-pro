@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Request, Response
+from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -57,7 +58,7 @@ def oauth_google(body: GoogleOAuthRequest, db: Session = Depends(get_db_session)
     if not sub:
         raise HTTPException(status_code=401, detail="Google profile missing sub")
 
-    user = db.query(User).filter(User.google_sub == sub).one_or_none()
+    user = db.query(User).filter(and_(User.google_sub == sub, User.deleted_at.is_(None))).one_or_none()
     email = info.get("email")
     if user is None:
         user = User(
@@ -72,7 +73,9 @@ def oauth_google(body: GoogleOAuthRequest, db: Session = Depends(get_db_session)
             db.flush()
         except IntegrityError:
             db.rollback()
-            user = db.query(User).filter(User.google_sub == sub).one()
+            user = db.query(User).filter(and_(User.google_sub == sub, User.deleted_at.is_(None))).one_or_none()
+            if user is None:
+                raise HTTPException(status_code=409, detail="Account conflict, please try again") from None
     else:
         if email and user.email != email:
             user.email = email
@@ -92,7 +95,7 @@ def oauth_google(body: GoogleOAuthRequest, db: Session = Depends(get_db_session)
 def register(body: RegisterRequest, response: Response, db: Session = Depends(get_db_session)):
     settings = get_settings()
     normalized = body.email.strip().lower()
-    exists = db.query(User).filter(User.email == normalized).one_or_none()
+    exists = db.query(User).filter(and_(User.email == normalized, User.deleted_at.is_(None))).one_or_none()
     if exists:
         raise HTTPException(status_code=409, detail="Email already registered")
 
@@ -114,7 +117,7 @@ def register(body: RegisterRequest, response: Response, db: Session = Depends(ge
 def login(body: LoginRequest, response: Response, db: Session = Depends(get_db_session)):
     settings = get_settings()
     normalized = body.email.strip().lower()
-    user = db.query(User).filter(User.email == normalized).one_or_none()
+    user = db.query(User).filter(and_(User.email == normalized, User.deleted_at.is_(None))).one_or_none()
     if user is None or not verify_password(body.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
@@ -150,6 +153,10 @@ def refresh_tokens(
         raise HTTPException(status_code=401, detail="Refresh token expired")
 
     user = row.user
+    if user.deleted_at is not None:
+        db.delete(row)
+        db.commit()
+        raise HTTPException(status_code=401, detail="Account deleted")
     db.delete(row)
     db.flush()
 

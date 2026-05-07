@@ -11,6 +11,7 @@ from app.celery_app import celery_app
 from app.db.models import Job
 from app.db.session import get_session_factory
 from app.services.credit_metering import apply_transcribe_credit_metering, failure_payload
+from app.services.job_account_guard import abort_job_if_user_soft_deleted
 from app.voice_engine.translate import translate_text
 from app.voice_engine.tts import synthesize as tts_synthesize
 
@@ -29,6 +30,8 @@ def synthesize_speech_task(job_id: str, transcript: str, target_language: str) -
         job = session.get(Job, jid)
         if job is None:
             raise ValueError(f"Job {job_id} not found")
+        if abort_job_if_user_soft_deleted(session, job):
+            return {"cancelled": True, "reason": "ACCOUNT_DELETED"}
         job.status = "processing"
         session.commit()
 

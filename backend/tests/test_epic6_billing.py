@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from app.config import Settings, get_settings
+from app.security.tokens import create_access_token
 from app.services.stripe_billing import (
     apply_stripe_webhook_payload,
     map_stripe_subscription_status,
@@ -325,7 +326,12 @@ def test_checkout_session_stripe_error_returns_502(mock_create):
     app.dependency_overrides[get_current_user] = lambda: fake_user
     try:
         client = TestClient(app)
-        response = client.post("/api/v1/billing/stripe/checkout-session")
+        settings = get_settings()
+        rl_token = create_access_token(uuid.uuid4(), settings)
+        response = client.post(
+            "/api/v1/billing/stripe/checkout-session",
+            headers={"Authorization": f"Bearer {rl_token}"},
+        )
         assert response.status_code == 502
         assert "card_declined" not in response.text
     finally:
@@ -346,7 +352,12 @@ def test_portal_session_stripe_error_returns_502(mock_create):
     app.dependency_overrides[get_current_user] = lambda: fake_user
     try:
         client = TestClient(app)
-        response = client.post("/api/v1/billing/stripe/portal-session")
+        settings = get_settings()
+        rl_token = create_access_token(uuid.uuid4(), settings)
+        response = client.post(
+            "/api/v1/billing/stripe/portal-session",
+            headers={"Authorization": f"Bearer {rl_token}"},
+        )
         assert response.status_code == 502
         assert "portal_error" not in response.text
     finally:
