@@ -13,6 +13,187 @@ type GatePrompt =
   | { kind: "exhausted"; message: string }
   | { kind: "lowCredit"; minutes: number };
 
+/* ── Design tokens ── */
+const T = {
+  black: "#0e0f0c",
+  green: "#9fe870",
+  darkGreen: "#163300",
+  mint: "#e2f6d5",
+  warmDark: "#454745",
+  gray: "#868685",
+  danger: "#d03238",
+  dangerBg: "rgba(208,50,56,0.09)",
+  ring: "rgba(14,15,12,0.12) 0px 0px 0px 1px",
+  font: "'Inter',Helvetica,Arial,sans-serif",
+};
+
+/* ── Shared micro-styles ── */
+const base: React.CSSProperties = {
+  fontFamily: T.font,
+  fontFeatureSettings: '"calt"',
+  WebkitFontSmoothing: "antialiased",
+} as React.CSSProperties;
+
+function BtnGreen({
+  children,
+  disabled,
+  onClick,
+  style,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick?: () => void;
+  style?: React.CSSProperties;
+}) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        ...base,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 6,
+        background: disabled ? "rgba(159,232,112,0.4)" : T.green,
+        color: T.darkGreen,
+        border: "none",
+        borderRadius: 9999,
+        padding: "8px 16px",
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: disabled ? "not-allowed" : "pointer",
+        transform: hover && !disabled ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.15s ease",
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BtnGhost({
+  children,
+  disabled,
+  onClick,
+  style,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick?: () => void;
+  style?: React.CSSProperties;
+}) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        ...base,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(22,51,0,0.07)",
+        color: T.black,
+        border: "none",
+        borderRadius: 9999,
+        padding: "7px 14px",
+        fontSize: 12,
+        fontWeight: 600,
+        cursor: disabled ? "not-allowed" : "pointer",
+        transform: hover && !disabled ? "scale(1.05)" : "scale(1)",
+        transition: "transform 0.15s ease",
+        ...style,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+/* ── Status dot ── */
+function StatusDot({ status }: { status: string }) {
+  const isError = status === "Error";
+  const isProcessing =
+    status !== "Ready" && status !== "Error" && status !== "Idle";
+  const color = isError ? T.danger : isProcessing ? "#ffd11a" : T.green;
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        width: 7,
+        height: 7,
+        borderRadius: "50%",
+        background: color,
+        boxShadow: `0 0 0 2px ${color}33`,
+        flexShrink: 0,
+      }}
+    />
+  );
+}
+
+/* ── Toggle switch ── */
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
+  return (
+    <label
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        cursor: "pointer",
+        userSelect: "none",
+      }}
+    >
+      <span style={{ fontSize: 13, fontWeight: 600, color: T.black }}>{label}</span>
+      <span
+        onClick={() => onChange(!checked)}
+        style={{
+          display: "inline-flex",
+          width: 38,
+          height: 22,
+          borderRadius: 9999,
+          background: checked ? T.green : "rgba(14,15,12,0.15)",
+          position: "relative",
+          transition: "background 0.2s ease",
+          flexShrink: 0,
+          cursor: "pointer",
+        }}
+      >
+        <span
+          style={{
+            position: "absolute",
+            top: 3,
+            left: checked ? 19 : 3,
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            background: checked ? T.darkGreen : "#ffffff",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+            transition: "left 0.2s ease, background 0.2s ease",
+          }}
+        />
+      </span>
+    </label>
+  );
+}
+
+/* ── Main component ── */
 export default function App() {
   const [dubMode, setDubMode] = useState(false);
   const [lang, setLang] = useState("vi");
@@ -56,10 +237,7 @@ export default function App() {
     if (typeof s.accessToken !== "string" || !s.accessToken) {
       return await new Promise((resolve) => {
         gateResolverRef.current = resolve;
-        setGatePrompt({
-          kind: "login",
-          message: "Đăng nhập để dùng dubbing và trừ phút credit.",
-        });
+        setGatePrompt({ kind: "login", message: "Đăng nhập để dùng dubbing và trừ phút credit." });
       });
     }
     if (s.userHasPaidPlan === true) return true;
@@ -67,19 +245,13 @@ export default function App() {
     if (typeof m !== "number") {
       return await new Promise((resolve) => {
         gateResolverRef.current = resolve;
-        setGatePrompt({
-          kind: "sync",
-          message: "Chưa đồng bộ thông tin credit. Đóng và mở lại popup để thử lại.",
-        });
+        setGatePrompt({ kind: "sync", message: "Chưa đồng bộ thông tin credit. Đóng và mở lại popup để thử lại." });
       });
     }
     if (m <= 0) {
       return await new Promise((resolve) => {
         gateResolverRef.current = resolve;
-        setGatePrompt({
-          kind: "exhausted",
-          message: "Hết phút credit. Nâng cấp hoặc chờ reset miễn phí đầu tháng.",
-        });
+        setGatePrompt({ kind: "exhausted", message: "Hết phút credit. Nâng cấp hoặc chờ reset miễn phí đầu tháng." });
       });
     }
     if (m <= 2) {
@@ -123,7 +295,6 @@ export default function App() {
     });
   }, [loadTabOverride]);
 
-  /** Epic 5.2: khi browser online, báo SW thử lại pull nếu đang pending. */
   useEffect(() => {
     const onOnline = () => {
       void chrome.runtime
@@ -157,12 +328,8 @@ export default function App() {
       area: string,
     ) => {
       if (area === "local") {
-        if (changes.dubStatus?.newValue !== undefined) {
-          setStatus(String(changes.dubStatus.newValue));
-        }
-        if (changes.dubErrorMessage?.newValue !== undefined) {
-          setErrorDetail(String(changes.dubErrorMessage.newValue ?? ""));
-        }
+        if (changes.dubStatus?.newValue !== undefined) setStatus(String(changes.dubStatus.newValue));
+        if (changes.dubErrorMessage?.newValue !== undefined) setErrorDetail(String(changes.dubErrorMessage.newValue ?? ""));
         if (changes.accessToken !== undefined || changes.creditMinutes !== undefined) {
           chrome.storage.local.get(["accessToken", "creditMinutes"], (s) => {
             setSignedIn(typeof s.accessToken === "string" && s.accessToken.length > 0);
@@ -196,212 +363,434 @@ export default function App() {
     setTabMode(mode);
   }
 
-  return (
-    <div style={{ padding: 12, fontFamily: "system-ui", minWidth: 280 }}>
-      <h1 style={{ fontSize: 14, margin: "0 0 8px" }}>Voice-Pro Dub</h1>
+  /* ── Credit bar width ── */
+  const creditPct =
+    creditMinutes !== null ? Math.min(100, Math.max(0, (creditMinutes / 30) * 100)) : null;
+  const creditColor =
+    creditPct !== null
+      ? creditPct > 50
+        ? T.green
+        : creditPct > 15
+          ? "#ffd11a"
+          : T.danger
+      : T.green;
 
-      {gatePrompt ? (
-        <div
-          role="dialog"
-          aria-modal="true"
+  return (
+    <div
+      style={{
+        ...base,
+        width: 300,
+        minWidth: 300,
+        background: "#ffffff",
+        color: T.black,
+        padding: 0,
+        overflow: "hidden",
+      }}
+    >
+      {/* Header bar */}
+      <div
+        style={{
+          background: T.black,
+          padding: "14px 16px 12px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span
           style={{
-            marginBottom: 12,
-            padding: 10,
-            borderRadius: 6,
-            border: "1px solid #ccc",
-            background: "#fafafa",
-            fontSize: 12,
+            fontSize: 15,
+            fontWeight: 900,
+            color: "#ffffff",
+            letterSpacing: "-0.3px",
           }}
         >
-          {gatePrompt.kind === "lowCredit" ? (
-            <>
-              <div style={{ marginBottom: 8 }}>
-                Còn {gatePrompt.minutes} phút — Upgrade để tiếp tục thoải mái. Bật Dub anyway?
-              </div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                <button type="button" style={{ fontSize: 11, cursor: "pointer" }} onClick={() => resolveGate(false)}>
-                  Hủy
-                </button>
-                <button type="button" style={{ fontSize: 11, cursor: "pointer" }} onClick={() => resolveGate(true)}>
-                  Tiếp tục
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ marginBottom: 8 }}>{gatePrompt.message}</div>
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <button type="button" style={{ fontSize: 11, cursor: "pointer" }} onClick={() => resolveGate(false)}>
-                  OK
-                </button>
-              </div>
-            </>
-          )}
+          Voice<span style={{ color: T.green }}>Pro</span>
+        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <StatusDot status={status} />
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>
+            {status}
+          </span>
         </div>
-      ) : null}
+      </div>
 
-      {!signedIn ? (
-        <div style={{ marginBottom: 12 }}>
-          <button
-            type="button"
-            disabled={authBusy}
-            style={{ cursor: authBusy ? "wait" : "pointer", padding: "6px 10px", fontSize: 12 }}
-            onClick={() => {
-              setAuthError("");
-              setAuthBusy(true);
-              void signInWithGoogle()
-                .then(async () => {
-                  const { accessToken } = await chrome.storage.local.get("accessToken");
-                  if (typeof accessToken === "string") {
-                    const pulled = await pullUserSettingsToSync(accessToken);
-                    if (!pulled) {
-                      await chrome.storage.local.set({
-                        vpSettingsPullRetryActive: true,
-                        vpSettingsPullRetryAttempts: 0,
-                      });
-                      void chrome.runtime
-                        .sendMessage({ type: "VP_START_SETTINGS_PULL_RETRY" })
-                        .catch(() => undefined);
-                    }
-                  }
-                  setSignedIn(true);
-                  chrome.storage.local.get(["userDisplayName", "userEmail", "userAvatarUrl", "creditMinutes"], (s) => {
-                    if (typeof s.userDisplayName === "string") setUserName(s.userDisplayName);
-                    if (typeof s.userEmail === "string") setUserEmail(s.userEmail);
-                    if (typeof s.userAvatarUrl === "string") setAvatarUrl(s.userAvatarUrl);
-                    if (typeof s.creditMinutes === "number") setCreditMinutes(s.creditMinutes);
-                  });
-                })
-                .catch((e) => setAuthError(e instanceof Error ? e.message : String(e)))
-                .finally(() => setAuthBusy(false));
+      <div style={{ padding: "14px 16px" }}>
+
+        {/* Gate prompt modal */}
+        {gatePrompt ? (
+          <div
+            role="dialog"
+            aria-modal="true"
+            style={{
+              background: "#f8faf7",
+              borderRadius: 16,
+              padding: "14px",
+              marginBottom: 12,
+              boxShadow: T.ring,
             }}
           >
-            Sign in with Google
-          </button>
-          {authError ? (
-            <div style={{ fontSize: 11, color: "#b00020", marginTop: 6 }}>{authError}</div>
-          ) : null}
-          <div style={{ fontSize: 10, color: "#888", marginTop: 6 }}>
-            Cần Google OAuth Client ID (Chrome extension) trong biến môi trường build.
+            {gatePrompt.kind === "lowCredit" ? (
+              <>
+                <p
+                  style={{
+                    margin: "0 0 10px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    lineHeight: 1.45,
+                    color: T.black,
+                  }}
+                >
+                  Còn {gatePrompt.minutes} phút — Bật Dub tiếp?
+                </p>
+                <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                  <BtnGhost onClick={() => resolveGate(false)}>Hủy</BtnGhost>
+                  <BtnGreen onClick={() => resolveGate(true)}>Tiếp tục</BtnGreen>
+                </div>
+              </>
+            ) : (
+              <>
+                <p
+                  style={{
+                    margin: "0 0 10px",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    lineHeight: 1.45,
+                    color:
+                      gatePrompt.kind === "exhausted"
+                        ? T.danger
+                        : T.black,
+                  }}
+                >
+                  {gatePrompt.message}
+                </p>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <BtnGhost onClick={() => resolveGate(false)}>Đóng</BtnGhost>
+                </div>
+              </>
+            )}
           </div>
-        </div>
-      ) : (
+        ) : null}
+
+        {/* Auth section */}
+        {!signedIn ? (
+          <div
+            style={{
+              background: "#f8faf7",
+              borderRadius: 16,
+              padding: "14px",
+              marginBottom: 12,
+              boxShadow: T.ring,
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontSize: 13,
+                fontWeight: 600,
+                color: T.black,
+              }}
+            >
+              Đăng nhập để bắt đầu dubbing
+            </p>
+            <BtnGreen
+              disabled={authBusy}
+              style={{ width: "100%" }}
+              onClick={() => {
+                setAuthError("");
+                setAuthBusy(true);
+                void signInWithGoogle()
+                  .then(async () => {
+                    const { accessToken } = await chrome.storage.local.get("accessToken");
+                    if (typeof accessToken === "string") {
+                      const pulled = await pullUserSettingsToSync(accessToken);
+                      if (!pulled) {
+                        await chrome.storage.local.set({
+                          vpSettingsPullRetryActive: true,
+                          vpSettingsPullRetryAttempts: 0,
+                        });
+                        void chrome.runtime
+                          .sendMessage({ type: "VP_START_SETTINGS_PULL_RETRY" })
+                          .catch(() => undefined);
+                      }
+                    }
+                    setSignedIn(true);
+                    chrome.storage.local.get(
+                      ["userDisplayName", "userEmail", "userAvatarUrl", "creditMinutes"],
+                      (s) => {
+                        if (typeof s.userDisplayName === "string") setUserName(s.userDisplayName);
+                        if (typeof s.userEmail === "string") setUserEmail(s.userEmail);
+                        if (typeof s.userAvatarUrl === "string") setAvatarUrl(s.userAvatarUrl);
+                        if (typeof s.creditMinutes === "number") setCreditMinutes(s.creditMinutes);
+                      },
+                    );
+                  })
+                  .catch((e) => setAuthError(e instanceof Error ? e.message : String(e)))
+                  .finally(() => setAuthBusy(false));
+              }}
+            >
+              {authBusy ? "Đang đăng nhập..." : "🔑 Sign in with Google"}
+            </BtnGreen>
+            {authError ? (
+              <div
+                style={{
+                  marginTop: 8,
+                  fontSize: 12,
+                  color: T.danger,
+                  fontWeight: 600,
+                  background: T.dangerBg,
+                  borderRadius: 8,
+                  padding: "6px 10px",
+                }}
+              >
+                {authError}
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          /* User info card */
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 12,
+              padding: "10px 12px",
+              borderRadius: 16,
+              background: "#f8faf7",
+              boxShadow: T.ring,
+            }}
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt=""
+                width={34}
+                height={34}
+                style={{ borderRadius: "50%", flexShrink: 0 }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "50%",
+                  background: T.mint,
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 16,
+                }}
+              >
+                🎙
+              </div>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  color: T.black,
+                }}
+              >
+                {userName || userEmail || "Đã đăng nhập"}
+              </div>
+              {/* Credit bar */}
+              {creditMinutes !== null ? (
+                <div style={{ marginTop: 4 }}>
+                  <div
+                    style={{
+                      height: 4,
+                      borderRadius: 9999,
+                      background: "rgba(14,15,12,0.1)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${creditPct ?? 0}%`,
+                        background: creditColor,
+                        borderRadius: 9999,
+                        transition: "width 0.4s ease",
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 3,
+                      fontSize: 11,
+                      color: T.gray,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {creditMinutes} phút còn lại
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <BtnGhost
+              style={{ fontSize: 11, padding: "5px 10px", flexShrink: 0 }}
+              onClick={() => void signOut().then(() => setSignedIn(false))}
+            >
+              Ra
+            </BtnGhost>
+          </div>
+        )}
+
+        {/* Controls */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: 8,
+            flexDirection: "column",
+            gap: 10,
+            background: "#f8faf7",
+            borderRadius: 16,
+            padding: "12px 14px",
             marginBottom: 12,
-            paddingBottom: 8,
-            borderBottom: "1px solid #eee",
+            boxShadow: T.ring,
           }}
         >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" width={32} height={32} style={{ borderRadius: "50%" }} />
-          ) : (
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#ddd" }} />
-          )}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>
-              {userName || userEmail || "Đã đăng nhập"}
-            </div>
-            <div style={{ fontSize: 11, color: "#555" }}>
-              {creditMinutes !== null ? `${creditMinutes} phút còn lại` : "—"}
-            </div>
-          </div>
-          <button
-            type="button"
-            style={{ fontSize: 11, cursor: "pointer" }}
-            onClick={() => {
-              void signOut().then(() => setSignedIn(false));
+          {/* Dub mode toggle */}
+          <Toggle
+            checked={dubMode}
+            label="Dub Mode (toàn cục)"
+            onChange={(v) => {
+              if (v) {
+                void confirmFreeTierDubEnable().then((ok) => {
+                  if (!ok) return;
+                  setDubMode(true);
+                  void chrome.storage.sync.set({ dubMode: true });
+                  schedulePushUserSettings();
+                });
+                return;
+              }
+              setDubMode(false);
+              void chrome.storage.sync.set({ dubMode: false });
+              schedulePushUserSettings();
             }}
-          >
-            Đăng xuất
-          </button>
-        </div>
-      )}
+          />
 
-      <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-        <input
-          type="checkbox"
-          checked={dubMode}
-          onChange={(e) => {
-            const v = e.target.checked;
-            if (v) {
-              void confirmFreeTierDubEnable().then((ok) => {
-                if (!ok) return;
-                setDubMode(true);
-                void chrome.storage.sync.set({ dubMode: true });
+          {/* Language select */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <label
+              htmlFor="lang-select"
+              style={{ fontSize: 13, fontWeight: 600, color: T.black }}
+            >
+              Ngôn ngữ đích
+            </label>
+            <select
+              id="lang-select"
+              value={lang}
+              onChange={(e) => {
+                const v = e.target.value;
+                setLang(v);
+                void chrome.storage.sync.set({ dubTargetLang: v });
                 schedulePushUserSettings();
-              });
-              return;
-            }
-            setDubMode(false);
-            void chrome.storage.sync.set({ dubMode: false });
-            schedulePushUserSettings();
-          }}
-        />
-        Dub Mode (global)
-      </label>
+              }}
+              style={{
+                ...base,
+                fontSize: 12,
+                fontWeight: 600,
+                color: T.black,
+                background: "#ffffff",
+                border: "1px solid rgba(14,15,12,0.15)",
+                borderRadius: 8,
+                padding: "5px 8px",
+                cursor: "pointer",
+                outline: "none",
+                maxWidth: 130,
+              }}
+            >
+              {LANG_OPTIONS.map((o) => (
+                <option key={o.code} value={o.code}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <label style={{ display: "block", fontSize: 12, marginBottom: 8 }}>
-        Ngôn ngữ đích
-        <select
-          value={lang}
-          onChange={(e) => {
-            const v = e.target.value;
-            setLang(v);
-            void chrome.storage.sync.set({ dubTargetLang: v });
-            schedulePushUserSettings();
-          }}
-          style={{ marginLeft: 8 }}
-        >
-          {LANG_OPTIONS.map((o) => (
-            <option key={o.code} value={o.code}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {tabId !== null ? (
-        <label style={{ display: "block", fontSize: 12, marginBottom: 8 }}>
-          Dub cho tab hiện tại
-          <select
-            value={tabMode}
-            onChange={(e) => void persistTabMode(e.target.value as TabDubMode)}
-            style={{ marginLeft: 8 }}
-          >
-            <option value="default">Theo global</option>
-            <option value="on">Luôn bật</option>
-            <option value="off">Luôn tắt</option>
-          </select>
-        </label>
-      ) : null}
-
-      <div style={{ fontSize: 11, color: "#666" }}>Status: {status}</div>
-      {status === "Error" ? (
-        <div style={{ marginTop: 6 }}>
-          {errorDetail ? (
-            <div style={{ fontSize: 11, color: "#b00020", marginBottom: 6 }}>{errorDetail}</div>
+          {/* Per-tab override */}
+          {tabId !== null ? (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <label
+                htmlFor="tab-mode"
+                style={{ fontSize: 13, fontWeight: 600, color: T.black }}
+              >
+                Tab này
+              </label>
+              <select
+                id="tab-mode"
+                value={tabMode}
+                onChange={(e) => void persistTabMode(e.target.value as TabDubMode)}
+                style={{
+                  ...base,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: T.black,
+                  background: "#ffffff",
+                  border: "1px solid rgba(14,15,12,0.15)",
+                  borderRadius: 8,
+                  padding: "5px 8px",
+                  cursor: "pointer",
+                  outline: "none",
+                  maxWidth: 130,
+                }}
+              >
+                <option value="default">Theo global</option>
+                <option value="on">Luôn bật</option>
+                <option value="off">Luôn tắt</option>
+              </select>
+            </div>
           ) : null}
-          <button
-            style={{ fontSize: 11, cursor: "pointer", padding: "2px 8px" }}
-            onClick={() => {
-              void confirmFreeTierDubEnable().then((ok) => {
-                if (!ok) return;
-                void chrome.storage.local.set({ dubStatus: "Ready", dubErrorMessage: "" });
-                void chrome.storage.sync.set({ dubMode: true });
-                setDubMode(true);
-                setStatus("Ready");
-                setErrorDetail("");
-              });
+        </div>
+
+        {/* Error state */}
+        {status === "Error" ? (
+          <div
+            style={{
+              background: T.dangerBg,
+              borderRadius: 12,
+              padding: "10px 12px",
+              marginBottom: 12,
             }}
           >
-            Thử lại
-          </button>
-        </div>
-      ) : null}
+            {errorDetail ? (
+              <p
+                style={{
+                  margin: "0 0 8px",
+                  fontSize: 12,
+                  color: T.danger,
+                  fontWeight: 600,
+                  lineHeight: 1.45,
+                }}
+              >
+                {errorDetail}
+              </p>
+            ) : null}
+            <BtnGhost
+              style={{ fontSize: 12 }}
+              onClick={() => {
+                void confirmFreeTierDubEnable().then((ok) => {
+                  if (!ok) return;
+                  void chrome.storage.local.set({ dubStatus: "Ready", dubErrorMessage: "" });
+                  void chrome.storage.sync.set({ dubMode: true });
+                  setDubMode(true);
+                  setStatus("Ready");
+                  setErrorDetail("");
+                });
+              }}
+            >
+              Thử lại
+            </BtnGhost>
+          </div>
+        ) : null}
+
+      </div>
     </div>
   );
 }

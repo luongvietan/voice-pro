@@ -3,12 +3,160 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { registerEmail } from "./api";
 
+const S = {
+  page: {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column" as const,
+    background: "#f8faf7",
+    fontFamily: "'Inter',Helvetica,Arial,sans-serif",
+    fontFeatureSettings: '"calt"',
+    color: "#0e0f0c",
+    WebkitFontSmoothing: "antialiased" as const,
+  } as React.CSSProperties,
+  center: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "40px 16px",
+  } as React.CSSProperties,
+  card: {
+    background: "#ffffff",
+    borderRadius: 30,
+    padding: "48px 40px",
+    width: "100%",
+    maxWidth: 420,
+    boxShadow: "rgba(14,15,12,0.12) 0px 0px 0px 1px",
+  } as React.CSSProperties,
+  logo: {
+    fontSize: 22,
+    fontWeight: 900,
+    textDecoration: "none",
+    color: "#0e0f0c",
+    display: "block",
+    marginBottom: 32,
+  } as React.CSSProperties,
+  heading: {
+    fontSize: 32,
+    fontWeight: 900,
+    lineHeight: 0.9,
+    letterSpacing: "-1px",
+    marginBottom: 8,
+    fontFeatureSettings: '"calt"',
+  } as React.CSSProperties,
+  subtext: {
+    fontSize: 15,
+    fontWeight: 400,
+    color: "#454745",
+    marginBottom: 36,
+    lineHeight: 1.55,
+  } as React.CSSProperties,
+  fieldGroup: {
+    marginBottom: 20,
+  } as React.CSSProperties,
+  label: {
+    display: "block",
+    fontSize: 14,
+    fontWeight: 600,
+    marginBottom: 8,
+    color: "#0e0f0c",
+  } as React.CSSProperties,
+  input: {
+    display: "block",
+    width: "100%",
+    padding: "12px 16px",
+    fontSize: 15,
+    fontWeight: 400,
+    fontFamily: "'Inter',Helvetica,Arial,sans-serif",
+    border: "1px solid rgba(14,15,12,0.2)",
+    borderRadius: 12,
+    outline: "none",
+    background: "#ffffff",
+    color: "#0e0f0c",
+    boxSizing: "border-box" as const,
+    transition: "border-color 0.15s ease, box-shadow 0.15s ease",
+  } as React.CSSProperties,
+  inputFocus: {
+    borderColor: "#9fe870",
+    boxShadow: "0 0 0 3px rgba(159,232,112,0.3)",
+  } as React.CSSProperties,
+  hint: {
+    marginTop: 6,
+    fontSize: 13,
+    color: "#868685",
+    fontWeight: 400,
+  } as React.CSSProperties,
+  btnPrimary: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    background: "#9fe870",
+    color: "#163300",
+    border: "none",
+    borderRadius: 9999,
+    padding: "13px 24px",
+    fontSize: 16,
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "transform 0.15s ease",
+    fontFamily: "'Inter',Helvetica,Arial,sans-serif",
+    marginTop: 8,
+  } as React.CSSProperties,
+  errorBox: {
+    background: "rgba(208,50,56,0.08)",
+    color: "#d03238",
+    borderRadius: 12,
+    padding: "12px 14px",
+    fontSize: 14,
+    fontWeight: 600,
+    marginTop: 16,
+    lineHeight: 1.4,
+  } as React.CSSProperties,
+  footer: {
+    marginTop: 28,
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: 8,
+  } as React.CSSProperties,
+  link: {
+    color: "#054d28",
+    textDecoration: "none",
+    fontWeight: 600,
+    fontSize: 14,
+  } as React.CSSProperties,
+  terms: {
+    fontSize: 12,
+    color: "#868685",
+    fontWeight: 400,
+    lineHeight: 1.5,
+    marginTop: 20,
+    padding: "14px 16px",
+    background: "#f8faf7",
+    borderRadius: 12,
+  } as React.CSSProperties,
+};
+
+function FocusInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <input
+      {...props}
+      style={{ ...S.input, ...(focused ? S.inputFocus : {}) }}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+    />
+  );
+}
+
 export default function RegisterPage() {
   const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [btnHover, setBtnHover] = useState(false);
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -21,44 +169,82 @@ export default function RegisterPage() {
   }
 
   return (
-    <main style={{ fontFamily: "system-ui", maxWidth: 360, margin: "48px auto", padding: 16 }}>
-      <h1 style={{ fontSize: 20 }}>Đăng ký</h1>
-      <p style={{ fontSize: 13, color: "#555" }}>Tối thiểu 8 ký tự, có chữ hoa và số.</p>
-      <form onSubmit={onSubmit}>
-        <label style={{ display: "block", marginBottom: 8 }}>
-          Email
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: 12 }}>
-          Mật khẩu
-          <input
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ display: "block", width: "100%", marginTop: 4 }}
-          />
-        </label>
-        <button type="submit" disabled={busy} style={{ padding: "8px 16px" }}>
-          {busy ? "..." : "Đăng ký"}
-        </button>
-      </form>
-      {error ? (
-        <pre style={{ color: "#b00020", fontSize: 12, whiteSpace: "pre-wrap" }}>{error}</pre>
-      ) : null}
-      <p style={{ marginTop: 16 }}>
-        <Link to="/login">Đã có tài khoản? Đăng nhập</Link>
-      </p>
-      <p style={{ marginTop: 8 }}>
-        <Link to="/">← Về trang chủ</Link>
-      </p>
-    </main>
+    <div style={S.page}>
+      <div style={S.center}>
+        <div style={S.card}>
+          <Link to="/" style={S.logo}>
+            Voice<span style={{ color: "#9fe870" }}>Pro</span>
+          </Link>
+
+          <h1 style={S.heading}>Tạo tài khoản</h1>
+          <p style={S.subtext}>
+            Miễn phí 30 phút credit/tháng. Không cần thẻ tín dụng.
+          </p>
+
+          <form onSubmit={onSubmit}>
+            <div style={S.fieldGroup}>
+              <label style={S.label} htmlFor="email">Email</label>
+              <FocusInput
+                id="email"
+                type="email"
+                required
+                value={email}
+                autoComplete="email"
+                placeholder="you@example.com"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div style={S.fieldGroup}>
+              <label style={S.label} htmlFor="password">Mật khẩu</label>
+              <FocusInput
+                id="password"
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                autoComplete="new-password"
+                placeholder="Tối thiểu 8 ký tự"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <p style={S.hint}>Tối thiểu 8 ký tự, bao gồm chữ hoa và số.</p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={busy}
+              style={{
+                ...S.btnPrimary,
+                transform: btnHover && !busy ? "scale(1.02)" : "scale(1)",
+                opacity: busy ? 0.7 : 1,
+                cursor: busy ? "wait" : "pointer",
+              }}
+              onMouseEnter={() => setBtnHover(true)}
+              onMouseLeave={() => setBtnHover(false)}
+            >
+              {busy ? "Đang tạo tài khoản..." : "Tạo tài khoản miễn phí"}
+            </button>
+          </form>
+
+          {error ? (
+            <div style={S.errorBox} role="alert">
+              {error}
+            </div>
+          ) : null}
+
+          <div style={S.terms}>
+            Bằng cách đăng ký, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của Voice-Pro.
+          </div>
+
+          <div style={S.footer}>
+            <Link to="/login" style={S.link}>
+              Đã có tài khoản? Đăng nhập →
+            </Link>
+            <Link to="/" style={{ ...S.link, color: "#868685", fontWeight: 400 }}>
+              ← Về trang chủ
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

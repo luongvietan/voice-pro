@@ -1,7 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root {
+  --color-near-black: #0e0f0c;
+  --color-wise-green: #9fe870;
+  --color-dark-green: #163300;
+  --color-light-mint: #e2f6d5;
+  --color-pastel-green: #cdffad;
+  --color-warm-dark: #454745;
+  --color-gray: #868685;
+  --color-light-surface: #e8ebe6;
+  --color-positive: #054d28;
+  --color-danger: #d03238;
+  --color-warning: #ffd11a;
+  --font-display: 'Inter', Helvetica, Arial, sans-serif;
+  --font-body: 'Inter', Helvetica, Arial, sans-serif;
+  --shadow-ring: rgba(14,15,12,0.12) 0px 0px 0px 1px;
+}
+
 * {
   box-sizing: border-box;
+  font-feature-settings: "calt";
 }
 
 body {
   margin: 0;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-near-black);
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-wise-green);
+  color: var(--color-dark-green);
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.44;
+  letter-spacing: -0.108px;
+  padding: 12px 28px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+.btn-primary:hover { transform: scale(1.05); }
+.btn-primary:active { transform: scale(0.95); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(22,51,0,0.08);
+  color: var(--color-near-black);
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease;
+}
+.btn-secondary:hover { transform: scale(1.05); }
+.btn-secondary:active { transform: scale(0.95); }
+
+.feature-card {
+  background: #ffffff;
+  border-radius: 30px;
+  padding: 32px 28px;
+  box-shadow: rgba(14,15,12,0.12) 0px 0px 0px 1px;
+  transition: transform 0.2s ease;
+}
+.feature-card:hover { transform: translateY(-4px); }
+
+.nav-link {
+  color: #454745;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  transition: background 0.15s ease;
+}
+.nav-link:hover { background: rgba(211,242,192,0.4); }

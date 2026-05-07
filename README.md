@@ -1,570 +1,326 @@
-<!-- 
-    title: Voice-Pro: Ultimate AI Voice Conversion and Multilingual Translation Tool
-    description: Powerful AI-powered web application for YouTube video processing, speech recognition, translation, and text-to-speech with multilingual support
-    keywords: AI voice conversion, YouTube translation, subtitle generation, speech-to-text, text-to-speech, voice cloning, multilingual translation, ElevenLabs Alternative 
-    author: ABUS
-    version: 2.0.0
-    last-updated: 2025-02-23
-    product-type: AI Multimedia Processing Software
-    platforms: Windows
-    technology-stack: Whisper, Edge-TTS, Gradio, CUDA, Faster-Whisper, Whisper-Timestamped, WhisperX, E2-TTS, F5-TTS, YouTube Downloader, Demucs, MDX-Net, RVC, CosyVoice, kokoro
-    license: LGPL
--->
-
-
-
-<h1 align="center">
-Voice-Pro
-</h1>
-
-<p align="center">
-  <i align="center">The best AI speech recognition, translation, and multilingual dubbing solution 🚀</i>
-</p>
-
-<h4 align="center">
-  <a href="https://deepwiki.com/abus-aikorea/voice-pro">
-    <img alt="Ask DeepWiki.com" src="https://deepwiki.com/badge.svg" style="height: 20px;">
-  </a>
-  <a href="https://www.youtube.com/channel/UCbCBWXuVbk-OBp9T4H5JjAA">
-    <img src="https://img.shields.io/badge/youtube-d95652.svg?style=flat-square&logo=youtube" alt="youtube" style="height: 20px;">
-  </a>
-  <a href="https://www.buymeacoffee.com/abus">
-    <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me a Coffee" style="height: 20px;">
-  </a>
-  <a href="https://github.com/abus-aikorea/voice-pro/releases">
-    <img src="https://img.shields.io/github/v/release/abus-aikorea/voice-pro" alt="release" style="height: 20px;">
-  </a>
-  <a href="https://github.com/abus-aikorea/voice-pro/stargazers">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/abus-aikorea/voice-pro">
-  </a>  
-</h4>
-
-<p align="center">
-    <img src="docs/images/main_page_crop.eng.jpg?raw=true" alt="Dubbing Studio"/>
-</p>
-<br />
-
-
-
-## 🎙️ An AI-powered web application for speech recognition, translation, and dubbing
-
-
-<p>  
-  <a href="docs/README.kor.md">
-    <img src="https://flagcdn.com/16x12/kr.png" alt="South Korea Flag" style="vertical-align: middle;"> 한국어
-  </a> ∙ 
-  <a href="docs/README.eng.md">
-    <img src="https://flagcdn.com/16x12/us.png" alt="United Kingdom Flag" style="vertical-align: middle;"> English
-  </a> ∙ 
-  <a href="docs/README.zh.md">
-    <img src="https://flagcdn.com/16x12/cn.png" alt="China Flag" style="vertical-align: middle;"> 中文简体
-  </a> ∙ 
-  <a href="docs/README.tw.md">
-    <img src="https://flagcdn.com/16x12/tw.png" alt="Taiwan Flag" style="vertical-align: middle;"> 中文繁體
-  </a> ∙ 
-  <a href="docs/README.jpn.md">
-    <img src="https://flagcdn.com/16x12/jp.png" alt="Japan Flag" style="vertical-align: middle;"> 日本語
-  </a> ∙ 
-  <a href="docs/README.deu.md">
-    <img src="https://flagcdn.com/16x12/de.png" alt="Germany Flag" style="vertical-align: middle;"> Deutsch
-  </a> ∙ 
-  <a href="docs/README.spa.md">
-    <img src="https://flagcdn.com/16x12/es.png" alt="Spain Flag" style="vertical-align: middle;"> Español
-  </a> ∙ 
-  <a href="docs/README.por.md">
-    <img src="https://flagcdn.com/16x12/pt.png" alt="Portugal Flag" style="vertical-align: middle;"> Português
-  </a>
-</p>
-
-Voice-Pro is a state-of-the-art web app that transforms multimedia content creation. It integrates YouTube video downloading, voice separation, speech recognition, translation, and text-to-speech into a single, powerful tool for creators, researchers, and multilingual professionals.
-- 🔊 Top-tier speech recognition: **Whisper**, **Faster-Whisper**, **Whisper-Timestamped**, **WhisperX**
-- 🎤 Zero-shot voice cloning: **F5-TTS**, **E2-TTS**, **CosyVoice**
-- 📢 Multilingual text-to-speech: **Edge-TTS**, **kokoro** (Paid version includes **Azure TTS**)
-- 🎥 YouTube processing & audio extraction: **yt-dlp**
-- 🌍 Instant translation for 100+ languages: **Deep-Translator** (Paid version includes **Azure Translator**)
-
-
-A robust alternative to **ElevenLabs**, Voice-Pro empowers podcasters, developers, and creators with advanced voice solutions.
-
-## ⚠️ Please Note
-- Due to [WeConnect](https://www.wctokyoseoul.com) development work, Voice-Pro development and updates are not possible for the time being.
-- We have made all Voice-Pro code open source and completely free. Voice-Pro can now be freely distributed and modified by anyone.
-- It works well on Windows with NVIDIA GPU. Operation on Mac and Linux has not been verified.
-- Please leave your requests on the [![GitHub Issues](https://img.shields.io/github/issues/abus-aikorea/voice-pro)](https://github.com/abus-aikorea/voice-pro/issues)  or  [![GitHub Discussions](https://img.shields.io/github/discussions/abus-aikorea/voice-pro)](https://github.com/abus-aikorea/voice-pro/discussions) pages.
-- **Troubleshooting**: In most cases, issues can be resolved by deleting the `installer_files` folder and then running `configure.bat` followed by `start.bat`.
-
-
-## 📰 News & History
-
-<details open>
-<summary>version 3.2</summary>
-
-- We have been focusing on [WeConnect](https://www.wctokyoseoul.com) development for the past few months and have not been able to manage Voice-Pro at all. 
-- We have decided to open source all Voice-Pro code.
-- Voice-Pro is completely free and supports Windows, Mac, Linux.
-- [WeConnect](https://www.wctokyoseoul.com) is an application for global cultural exchange.
-- Connect with people from all over the world for meaningful cultural exchanges, language learning, and international friendships.
-
-<p align="center">
-    <img src="docs/images/Hotpot 0.png?raw=true" alt="ScreenShot 0" width="18%"/>
-    <img src="docs/images/Hotpot 1.png?raw=true" alt="ScreenShot 1" width="18%"/>
-    <img src="docs/images/Hotpot 2.png?raw=true" alt="ScreenShot 2" width="18%"/>
-    <img src="docs/images/Hotpot 3.png?raw=true" alt="ScreenShot 3" width="18%"/>
-    <img src="docs/images/Hotpot 4.png?raw=true" alt="ScreenShot 4" width="18%"/>
-</p>
-
-</details>
-
-
-<details>
-<summary>version 3.1</summary>
-
-- 🪄 Support for fine-tuned models of **F5-TTS**
-- 🌍 Supported languages
-  - <img src="https://flagcdn.com/16x12/us.png" alt="United Kingdom Flag" style="vertical-align: middle;"> English & <img src="https://flagcdn.com/16x12/cn.png" alt="China Flag" style="vertical-align: middle;"> Chinese: <a href="https://huggingface.co/SWivid/F5-TTS/tree/main/F5TTS_v1_Base"> SWivid/F5-TTS_v1 </a> 
-  - <img src="https://flagcdn.com/16x12/fi.png" alt="Spain Flag" style="vertical-align: middle;"> Finnish: <a href="https://huggingface.co/AsmoKoskinen/F5-TTS_Finnish_Model"> AsmoKoskinen/F5-TTS_Finnish_Model </a> 
-  - <img src="https://flagcdn.com/16x12/fr.png" alt="Spain Flag" style="vertical-align: middle;"> French: <a href="https://huggingface.co/RASPIAUDIO/F5-French-MixedSpeakers-reduced"> RASPIAUDIO/F5-French-MixedSpeakers-reduced </a> 
-  - <img src="https://flagcdn.com/16x12/in.png" alt="Spain Flag" style="vertical-align: middle;"> Hindi: <a href="https://huggingface.co/SPRINGLab/F5-Hindi-24KHz"> SPRINGLab/F5-Hindi-24KHz </a>  
-  - <img src="https://flagcdn.com/16x12/it.png" alt="Spain Flag" style="vertical-align: middle;"> Italian: <a href="https://huggingface.co/alien79/F5-TTS-italian"> alien79/F5-TTS-italian </a>  
-  - <img src="https://flagcdn.com/16x12/jp.png" alt="Spain Flag" style="vertical-align: middle;"> Japanese: <a href="https://huggingface.co/Jmica/F5TTS/tree/main/JA_21999120"> Jmica/F5TTS/JA_21999120 </a>  
-  - <img src="https://flagcdn.com/16x12/ru.png" alt="Spain Flag" style="vertical-align: middle;"> Russian: <a href="https://huggingface.co/hotstone228/F5-TTS-Russian"> hotstone228/F5-TTS-Russian </a> 
-  - <img src="https://flagcdn.com/16x12/es.png" alt="Spain Flag" style="vertical-align: middle;"> Spanish: <a href="https://huggingface.co/jpgallegoar/F5-Spanish"> jpgallegoar/F5-Spanish </a> 
-  
-</details>
-
-<details>
-<summary>version 3.0</summary>
-
-- 🔥 Removed the **AI Cover** feature.  
-- 🚀 Added support for **m-bain/whisperX**.
-  
-</details>
-
-<details>
-<summary>version 2.0</summary>
-
-- 🐍 Built with Python 3.10.15, Torch 2.5.1+cu124, and Gradio 5.14.0.  
-- 🆓 Free trial supports media up to **60 seconds** in length.  
-- 🔥 Added the **AI Cover** feature.  
-- 🎤 Introduced support for **CosyVoice** and **kokoro**.  
-- ⏳ Initial run downloads **CozyVoice2-0.5B (9GB)**, which may take over an hour depending on network speed.  
-- 🎧 Voice samples for cloning will be continuously updated.  
-- 📝 Added **spaCy** for natural sentence-by-sentence translation and TTS.  
-- ☁️ Subscription version includes **Microsoft Azure** Translator and TTS.  
-- 🏪 Subscription offers **unlimited usage** (no 60-second limit) during the subscription period, available via [![Shopify](https://img.shields.io/badge/Shopify-7ab55c.svg?style=flat-square&logo=shopify&logoColor=white)](https://r17wvy-t2.myshopify.com).
-  
-</details>
-
-## 🎥 YouTube Showcase
-
-<table style="border-collapse: collapse; width: 100%;">
-  <tr>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/scC5CicZ6G0" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/scC5CicZ6G0/hqdefault.jpg" alt="Demo Video 1" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">Demo for Voice-Pro (v2.0)</span>
-      </a>
-    </td>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/Wfo7vQCD4no" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/Wfo7vQCD4no/hqdefault.jpg" alt="Demo Video 2" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">F5-TTS: Voice Cloning</span>
-      </a>
-    </td>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/GOzCDj4MCpo" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/GOzCDj4MCpo/hqdefault.jpg" alt="Demo Video 3" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">Live Transcription & Translation</span>
-      </a>
-    </td>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/YdAq80wjtuQ" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/YdAq80wjtuQ/hqdefault.jpg" alt="Demo Video 4" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">Multi-Lingual Voice Cloning: Korean - German</span>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/Tu2okoHY174" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/Tu2okoHY174/hqdefault.jpg" alt="Demo Video 5" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">Multi-Lingual Voice Cloning: English - Korean</span>
-      </a>
-    </td>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/dWCEwO56_7Y" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/dWCEwO56_7Y/hqdefault.jpg" alt="Demo Video 6" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">Multi-Lingual Voice Cloning: Korean - Japanese</span>
-      </a>
-    </td>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/HXomwoKS3V4" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/HXomwoKS3V4/hqdefault.jpg" alt="Demo Video 7" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">NVIDIA RTX Video Super-Resolution</span>
-      </a>
-    </td>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/lZK7pLJBHb4" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/lZK7pLJBHb4/hqdefault.jpg" alt="Demo Video 8" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">AI Karaoke</span>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td style="padding: 10px; border: none;" align="center">
-      <a href="https://youtu.be/Co70lh95EsQ" style="text-decoration: none; color: inherit;">
-        <img src="https://img.youtube.com/vi/Co70lh95EsQ/hqdefault.jpg" alt="Demo Video 5" width="240" height="135" style="border-radius: 4px;">
-        <br>
-        <span style="font-size: 16px; font-weight: 600; color: #0f0f0f; line-height: 1.2;">Multi-Lingual Voice Cloning: English - Korean</span>
-      </a>
-    </td>
-  </tr>    
-</table>
-
-
-## ⭐ Key Features
-
-### 1. Dubbing Studio
-- YouTube video downloads & audio extraction
-- Voice separation with **Demucs**
-- Supports 100+ languages for speech recognition & translation
-
-### 2. Speech Technologies
-- **Speech-to-Text:** **Whisper**, **Faster-Whisper**, **Whisper-Timestamped**, **WhisperX**
-- **Text-to-Speech:** 
-  - **Edge-TTS**: 100+ languages, 400+ voices
-  - **E2-TTS**, **F5-TTS**, **CosyVoice**: Zero-shot cloning
-  - **kokoro**: Ranked #2 in HuggingFace TTS Arena
-
-### 3. Real-Time Translation
-- Instant speech recognition
-- Multilingual translation on the fly
-- Customizable audio inputs
-
-
-## 🤖 WebUI
-
-### `Dubbing Studio` Tab
-- All-in-one hub: YouTube downloads, noise removal, subtitles, translation, & TTS
-- Supports all ffmpeg-compatible formats
-- Output options: WAV, FLAC, MP3
-- Subtitles & recognition for 100+ languages
-- TTS with speed, volume, & pitch controls
-  
-<p align="center">
-  <img style="width: 90%; height: 90%" src="docs/images/main_page.eng.jpg?raw=true" alt="Multilingual Voice Conversion and Subtitle Generation Web UI Interface"/>
-</p>  
-
-
-### `Whisper Caption` Tab
-- Subtitle-focused: 90+ languages
-- Video-integrated subtitle display
-- Word-level highlighting & denoise options
-
-### `Translate` Tab
-- Translation for 100+ languages
-- Supports subtitle files (ASS, SSA, SRT, etc.)
-- Real-time voice recognition & translation
-
-<p align="center">
-  <img style="width: 90%; height: 90%" src="docs/images/live_translation_bbc.jpg?raw=true" alt="WebUI for Real-Time Speech Recognition and Translation"/>
-</p>  
-
-### `Speech Generation` Tab
-- Options: **Edge-TTS**, **F5-TTS**, **CosyVoice**, **kokoro**
-- Celeb voice podcasts & multilingual support
-
-<p align="center">
-  <img style="width: 90%; height: 90%" src="docs/images/tts_f5_multi.jpg?raw=true" alt="Podcast Production WebUI Using Voice-Cloning Technology"/>
-</p>  
-
-
-
-## 🎤✨ Reference Voice
-
-- Please request the voice you want to add on the Issues page. [Issues](https://github.com/abus-aikorea/voice-pro/issues/50)  
-
-<details>
-<summary>
-English
-</summary> <br />
-
-<table>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Andrew Bustamante.jpg" width="150"><br>Andrew Bustamante</td>
-    <td align="center"><img src="celebrities30sREADME/English/Andrew Huberman.jpg" width="150"><br>Andrew Huberman</td>
-    <td align="center"><img src="celebrities30sREADME/English/Avi Loeb.jpg" width="150"><br>Avi Loeb</td>
-    <td align="center"><img src="celebrities30sREADME/English/Ben Shapiro.jpg" width="150"><br>Ben Shapiro</td>
-    <td align="center"><img src="celebrities30sREADME/English/Brett Johnson.jpg" width="150"><br>Brett Johnson</td>
-    <td align="center"><img src="celebrities30sREADME/English/Brian Keating.jpg" width="150"><br>Brian Keating</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Coffeezilla.jpg" width="150"><br>Coffeezilla</td>
-    <td align="center"><img src="celebrities30sREADME/English/Dan Carlin.jpg" width="150"><br>Dan Carlin</td>
-    <td align="center"><img src="celebrities30sREADME/English/David Buss.jpg" width="150"><br>David Buss</td>
-    <td align="center"><img src="celebrities30sREADME/English/David Fravor.jpg" width="150"><br>David Fravor</td>
-    <td align="center"><img src="celebrities30sREADME/English/David Kipping.jpg" width="150"><br>David Kipping</td>
-    <td align="center"><img src="celebrities30sREADME/English/Dennis Whyte.jpg" width="150"><br>Dennis Whyte</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Donald Hoffman.jpg" width="150"><br>Donald Hoffman</td>
-    <td align="center"><img src="celebrities30sREADME/English/Donald Trump.jpg" width="150"><br>Donald Trump</td>
-    <td align="center"><img src="celebrities30sREADME/English/Douglas Murray.jpg" width="150"><br>Douglas Murray</td>
-    <td align="center"><img src="celebrities30sREADME/English/Duncan Trussell.jpg" width="150"><br>Duncan Trussell</td>
-    <td align="center"><img src="celebrities30sREADME/English/Elon Musk.jpg" width="150"><br>Elon Musk</td>
-    <td align="center"><img src="celebrities30sREADME/English/Garry Nolan.jpg" width="150"><br>Garry Nolan</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Jack Barsky.jpg" width="150"><br>Jack Barsky</td>
-    <td align="center"><img src="celebrities30sREADME/English/James Sexton.jpg" width="150"><br>James Sexton</td>
-    <td align="center"><img src="celebrities30sREADME/English/Jeff Bezos.jpg" width="150"><br>Jeff Bezos</td>
-    <td align="center"><img src="celebrities30sREADME/English/Joe Rogan.jpg" width="150"><br>Joe Rogan</td>
-    <td align="center"><img src="celebrities30sREADME/English/John Mearsheimer.jpg" width="150"><br>John Mearsheimer</td>
-    <td align="center"><img src="celebrities30sREADME/English/Jordan Peterson.jpg" width="150"><br>Jordan Peterson</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Kanye 'Ye' West.jpg" width="150"><br>Kanye 'Ye' West</td>
-    <td align="center"><img src="celebrities30sREADME/English/Mark Zuckerberg.jpg" width="150"><br>Mark Zuckerberg</td>
-    <td align="center"><img src="celebrities30sREADME/English/Michael Levin.jpg" width="150"><br>Michael Levin</td>
-    <td align="center"><img src="celebrities30sREADME/English/Michael Saylor.jpg" width="150"><br>Michael Saylor</td>
-    <td align="center"><img src="celebrities30sREADME/English/Michio Kaku.jpg" width="150"><br>Michio Kaku</td>
-    <td align="center"><img src="celebrities30sREADME/English/MrBeast.jpg" width="150"><br>MrBeast</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Nick Lane.jpg" width="150"><br>Nick Lane</td>
-    <td align="center"><img src="celebrities30sREADME/English/Paul Rosolie.jpg" width="150"><br>Paul Rosolie</td>
-    <td align="center"><img src="celebrities30sREADME/English/Ryan Graves.jpg" width="150"><br>Ryan Graves</td>
-    <td align="center"><img src="celebrities30sREADME/English/Sam Altman.jpg" width="150"><br>Sam Altman</td>
-    <td align="center"><img src="celebrities30sREADME/English/Sam Harris.jpg" width="150"><br>Sam Harris</td>
-    <td align="center"><img src="celebrities30sREADME/English/Stephen Wolfram.jpg" width="150"><br>Stephen Wolfram</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/English/Tucker Carlson.jpg" width="150"><br>Tucker Carlson</td>
-    <td align="center"><img src="celebrities30sREADME/English/Vitalik Buterin.jpg" width="150"><br>Vitalik Buterin</td>
-    <td align="center"><img src="celebrities30sREADME/English/Yuval Harari.jpg" width="150"><br>Yuval Harari</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
-</details>
-
-
-<details>
-<summary>
-Chinese
-</summary> <br />
-
-<table>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/Chinese/Dilraba Dilmurat.jpg" width="150"><br>迪丽热巴 (Dílì Rèbā)</td>
-    <td align="center"><img src="celebrities30sREADME/Chinese/Jolin Tsai.jpg" width="150"><br>蔡依林 (Cài Yīlín)</td>
-    <td align="center"><img src="celebrities30sREADME/Chinese/Kris Wu.jpg" width="150"><br>吴亦凡 (Wú Yìfán)</td>
-    <td align="center"><img src="celebrities30sREADME/Chinese/Li Yifeng.jpg" width="150"><br>李易峰 (Lǐ Yìfēng)</td>
-    <td align="center"><img src="celebrities30sREADME/Chinese/Yang Mi.jpg" width="150"><br>杨幂 (Yáng Mì)</td>
-    <td align="center"><img src="celebrities30sREADME/Chinese/Zhao Liying.jpg" width="150"><br>赵丽颖 (Zhào Lìyǐng)</td>
-  </tr>
-</table>
-</details>
-
-
-<details>
-<summary>
-Korean
-</summary> <br />
-
-<table>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/Korean/BTS Jin.jpg" width="150"><br>BTS 진 (Jin)</td>
-    <td align="center"><img src="celebrities30sREADME/Korean/BTS RM.jpg" width="150"><br>BTS RM</td>
-    <td align="center"><img src="celebrities30sREADME/Korean/IU.jpg" width="150"><br>IU (아이유)</td>
-    <td align="center"><img src="celebrities30sREADME/Korean/LeeByungHun.jpg" width="150"><br>이병헌</td>
-    <td align="center"><img src="celebrities30sREADME/Korean/LeeJungJae.jpg" width="150"><br>이정재</td>
-    <td align="center"><img src="celebrities30sREADME/Korean/YouJaeSuk.jpg" width="150"><br>유재석</td>
-  </tr>
-</table>
-</details>
-
-
-<details>
-<summary>
-Japanese
-</summary> <br />
-
-<table>
-  <tr>
-    <td align="center"><img src="celebrities30sREADME/Japanese/Ayase Haruka.jpg" width="150"><br>綾瀬はるか (Ayase Haruka)</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
-</details>
-<br />
-
-
-## 💻 System Requirements
-- **OS:** Windows 10/11 (64-bit), Linux, Mac
-- **GPU:** NVIDIA with CUDA 12.4 (recommended)
-- **VRAM:** 4GB+ (8GB+ preferred)
-- **RAM:** 4GB+
-- **Storage:** 20GB+ free space
-- **Internet:** Required
-
-
-
-## 📀 Installation
-
-Install Voice-Pro with ease using **configure.bat** and **start.bat** (use configure.sh and start.sh on Mac/Linux).
-
-
-### 1. Get the Package
-
-  + Clone or download the latest release (**Source code (zip)**) from  [![GitHub Release](https://img.shields.io/github/v/release/abus-aikorea/voice-pro)](https://github.com/abus-aikorea/voice-pro/)
-```bash
-git clone https://github.com/abus-aikorea/voice-pro.git
+# Voice-Pro — Universal Video Dubber
+
+> **Nghe bất kỳ video nào bằng ngôn ngữ của bạn — không phải subtitle, mà là giọng nói thật.**
+
+Chrome Extension + SaaS backend cho phép người dùng nghe dubbed audio của bất kỳ video YouTube nào bằng ngôn ngữ mẹ đẻ, đồng bộ hoàn toàn với video gốc. Pipeline: **Faster-Whisper STT → Neural MT → Edge-TTS** — chạy in-browser, không upload file, không rời khỏi trang.
+
+---
+
+## Tại sao sản phẩm này tồn tại
+
+~1.5 tỷ người không nói tiếng Anh đang tiêu thụ content YouTube, Coursera, và các nền tảng video. 90%+ nội dung chất lượng cao tồn tại chủ yếu bằng tiếng Anh. Subtitle đòi hỏi cognitive load đọc song song với xem — **audio dubbing giải phóng hoàn toàn giới hạn đó.**
+
+**Không có competitor nào** đang triển khai audio dubbing ở browser extension level với chất lượng này:
+
+| Competitor | Approach | Gap |
+|---|---|---|
+| Language Reactor (500K users) | Subtitle only | Không có audio dubbing |
+| Papago / DeepL Extension | Text translation | Không xử lý audio/video |
+| Maestra / HappyScribe | Upload-based SaaS | Không phải browser-native |
+| ElevenLabs Dubbing | Upload API | $50+/month, không có extension |
+
+---
+
+## Tính năng
+
+### MVP (Phase 1 — Tháng 1-3)
+
+- **Dub Mode** — thay toàn bộ audio bằng giọng nói ngôn ngữ đích
+- **10 ngôn ngữ:** Tiếng Việt, Nhật, Hàn, Tây Ban Nha, Bồ Đào Nha, Indonesia, Hindi, Đức, Pháp, Ả Rập
+- **YouTube support** (primary platform, no DRM)
+- **Credit system:** 10 phút/tháng miễn phí → $9/month (120 phút) → $19/month (unlimited)
+- **DRM detection** + graceful error cho Netflix, Disney+, Amazon Prime
+- Web dashboard: số dư credits, lịch sử, billing
+
+### Growth (Phase 2 — Tháng 4-9)
+
+- **Learn Mode** — audio song ngữ xen kẽ gốc + dịch (cho học ngôn ngữ)
+- **Shadow Mode** — luyện phát âm với Whisper scoring
+- Mở rộng platform: Coursera, Vimeo, Udemy, bất kỳ HTML5 video
+- Voice cloning (F5-TTS), auto-dub khi mở video
+
+### Vision (Phase 3 — Tháng 10+)
+
+- VoiceOS full platform
+- API tier cho developers
+- Real-time dubbing cho live streams
+- Firefox Android + Safari iOS
+- Team/family plans
+
+---
+
+## Kiến trúc
+
+### Monorepo Structure
+
 ```
-  
+voice-pro/
+├── extension/     # WXT (Chrome Extension Manifest V3)
+├── dashboard/     # Vite + React 19 + shadcn/ui (SPA)
+├── landing/       # Next.js 15 App Router (SSG/SEO)
+├── backend/       # Python FastAPI + Celery
+├── shared/        # TypeScript types dùng chung
+└── README.md
+```
 
-### 2. Install & Run
-1. 🚀 **configure.bat**
-   - Sets up git, ffmpeg, and CUDA (if NVIDIA GPU)
-   - Run once; takes 1+ hour with internet
-   - Don’t close the command window
-2. 🚀 **start.bat**
-   - Launches Voice-Pro WebUI
-   - First run installs dependencies (1+ hour)
-   - Retry after deleting **installer_files** if issues arise
+### Audio Pipeline
 
-### 3. Update
-- 🚀 **update.bat**: Refreshes Python environment (faster than reinstall)
+```
+tabCapture API → PCM 16kHz mono →  POST /api/v1/pipeline/process-chunk
+                                          ↓
+                              Faster-Whisper STT (RunPod GPU)
+                                          ↓
+                              Deep-Translator (Neural MT)
+                                          ↓
+                              Edge-TTS synthesis
+                                          ↓
+                    audio/mpeg stream → Web Audio API inject → video sync
+```
 
-### 4. Uninstall
-- Run **uninstall.bat** or delete the folder (portable install)
+**Latency targets:** first chunk ≤ 3s, subsequent chunks ≤ 1.5s, sync offset ≤ 300ms
 
+### Tech Stack
 
-## ❓Tips & Tricks
+| Layer | Technology |
+|---|---|
+| Extension | WXT v0.20+ · React 19 · TypeScript 5.7 |
+| Dashboard | Vite · React 19 · shadcn/ui v4 · Tailwind CSS v4 |
+| Landing | Next.js 15 App Router · SSG · Tailwind CSS v4 |
+| Backend | Python 3.11+ · FastAPI · Celery · SQLAlchemy 2.x |
+| Database | PostgreSQL 17 (port **5434**) · Alembic |
+| Cache/Queue | Redis 7 (Docker, host port **6380**) |
+| STT | Faster-Whisper (RunPod Serverless GPU) |
+| TTS | Edge-TTS (400+ voices, miễn phí) |
+| Translation | Deep-Translator |
+| Billing | Stripe |
+| Auth | JWT + Google OAuth (extension) · bcrypt (dashboard) |
+| Infra | Hetzner CPX22 VPS · Docker Compose · Nginx · Certbot |
+| CI/CD | GitHub Actions → SSH deploy · Chrome Web Store auto-publish |
+| Monitoring | Sentry · Plausible · UptimeRobot |
+| Package manager | pnpm 10.33.0 (JS) · uv (Python) |
 
-#### If Browser does not run automatically
-- Close the Windows-Commnad window and run start.bat again.
-- Run the browser directly and enter the address displayed in the Windows-Command window (e.g. **http://127.0.0.1:7870**) in the address bar.
+---
 
-#### If a CUDA Out-Of-Memory error occurs
-- Check the GPU memory status in Windows Task Manager - Performance tab. 
-- Set the Denoise level to 0 or 1. Denoise level 2 requires at least 8GB of GPU memory.
-- Set Compute Type to int type. The float type has better quality, but requires more GPU memory.
+## Development Setup
 
-#### How to improve the quality of subtitles?
-- The quality of subtitles tends to improve with larger Whisper models, but this is not necessarily the case. large > medium > small > base > tiny 
-- Among compute types, float type has good performance. The int type is a model that reduces GPU usage and increases speed through model quantization. On the other hand, performance decreases. 
-- If you increase the denoise level, more background sounds will be removed, and only the remaining voice will be used for voice recognition. It does not always guarantee good results.
-  
+### Prerequisites
 
+- Node.js ≥ 20, pnpm 10.33.0
+- Python ≥ 3.11, uv
+- Docker Desktop (cho Redis + PostgreSQL)
+- PostgreSQL chạy trên port **5434** (không phải 5432 mặc định)
 
-## 🚨 Notice
-- Due to [WeConnect](https://www.wctokyoseoul.com) development work, there will be no Voice-Pro updates for the time being.
-- All Voice-Pro code has been made open source. It is now completely free to use.
-- [WeConnect](https://www.wctokyoseoul.com) is a communication platform for global cultural exchange.
+### 1. Clone & Install
 
+```bash
+git clone https://github.com/your-org/voice-pro.git
+cd voice-pro
+pnpm install          # cài toàn bộ workspace
+```
 
+### 2. Backend Setup
 
-<br />
+```bash
+cd backend
+cp .env.example .env  # điền các giá trị cần thiết
+uv sync               # cài Python dependencies
+alembic upgrade head  # apply database migrations
+```
 
+`.env` quan trọng:
 
-## ⏳ SaaS Platforms for Subtitling, Translation, and TTS
+```env
+DATABASE_URL=postgresql+psycopg2://voicepro:voicepro@127.0.0.1:5434/voicepro
+REDIS_URL=redis://localhost:6380/0
+JWT_SECRET=<min-32-chars>
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
 
-The following table lists SaaS platforms supporting subtitling, translation, and text-to-speech (TTS/dubbing) functionalities. Costs are calculated for processing a 60-minute Korean video, including subtitle generation, English translation, and English dubbing, based on the latest available pricing data as of April 15, 2025.
+### 3. Start Local Services
 
-| Platform        | Subtitling | Translation | TTS/Dubbing | Cost for 60-min Video (USD, Approx.) | Key Features                                                                 |
-|-----------------|------------|-------------|-------------|-------------------------------------|------------------------------------------------------------------------------|
-| **[Maestra](https://maestra.ai)**     | ✅         | ✅          | ✅          | $23.70                              | 125+ languages, real-time captions, SEO keyword extraction, 15-min free trial. |
-| **[Kapwing](https://www.kapwing.com)**     | ✅         | ✅          | ✅          | $30~$40 (Pro plan, per minute)     | AI subtitles, 100+ language translations, auto lip-sync dubbing, free tier.   |
-| **[VEED.IO](https://www.veed.io)**     | ✅         | ✅          | ❌          | $24~$36 (Pro plan, partial)        | 99.9% accurate subtitles, Instagram-optimized captions, intuitive editor.     |
-| **[HappyScribe](https://happyscribe.com)** | ✅         | ✅          | ✅          | $36~$48 (Pay-as-you-go)            | 120+ languages, professional proofreading, secure, meeting transcription.     |
-| **[Sonix](https://sonix.ai)**       | ✅         | ✅          | ✅          | $30~$40 (Standard plan)            | 54+ languages, 30-min free transcription, YouTube/Zoom integration.           |
-| **[Descript](https://descript.com)**    | ✅         | ✅          | ✅          | $36~$48 (Creator plan)             | Text-based editing, Overdub TTS, filler word removal, 1-hour free transcription. |
-| **[AppTek](https://apptek.ai)**      | ✅         | ✅          | ✅          | Custom pricing (Contact)            | Media-focused, custom models, metadata generation, cloud-based Workbench.     |
-| **[Transkriptor](https://transkriptor.com)**| ✅         | ✅          | ❌          | $12~$18 (Pay-as-you-go)            | 100+ languages, YouTube link transcription, 99% accuracy, simple editor.      |
+```bash
+# Redis (Docker)
+docker run -d --name voicepro-redis -p 6380:6379 redis:7
 
-### Cost Calculation Details
-- **[Maestra](https://maestra.ai/)**: Premium Plan ($158/month, 1200 credits). 60-min video: 60 credits (subtitles) + 60 credits (translation) + 60 credits (dubbing) = 180 credits. Cost = (180/1200) * $158 = $23.70.[](https://maestra.ai/pricing)
-- **[Kapwing](https://www.kapwing.com)**: Pro plan (\~$24/month, limited minutes). Estimated $0.50\~$0.67/min for subtitles+translation+dubbing (based on per-minute pricing trends). 60-min cost: $30\~$40. Exact pricing requires confirmation.
-- **[VEED.IO](https://www.veed.io)**: Pro plan (\~$24/month). Subtitles+translation estimated at $0.40\~$0.60/min. No TTS, so partial processing. 60-min cost: $24\~$36. Confirm at [veed.io](https://veed.io).
-- **[HappyScribe](https://happyscribe.com)**: Pay-as-you-go (\~$0.20/min transcription, $0.20/min translation, $0.20/min dubbing). 60-min cost: $36\~$48 (assuming combined services). Confirm at [happyscribe.com](https://happyscribe.com).
-- **[Sonix](https://sonix.ai)**: Standard plan (\~$10/hour transcription, additional for translation/dubbing). Estimated $0.50\~$0.67/min total. 60-min cost: $30\~$40. Confirm at [sonix.ai](https://sonix.ai).
-- **[Descript](https://descript.com)**: Creator plan (\~$24/month, limited hours). Estimated $0.60\~$0.80/min for subtitles+translation+dubbing. 60-min cost: $36\~$48. Confirm at [descript.com](https://descript.com).
-- **[AppTek](https://apptek.ai)**: Custom pricing for enterprise. No public per-minute rates. Contact [apptek.ai](https://apptek.ai) for quotes.
-- **[Transkriptor](https://transkriptor.com)**: Pay-as-you-go ($0.05\~$0.10/min transcription, similar for translation). No TTS, so partial processing. 60-min cost: $12\~$18. Confirm at [transkriptor.com](https://transkriptor.com).
+# Backend API
+cd backend
+uvicorn main:app --reload --port 8000
 
-### Notes
-- **Cost for 60-min Video**: Costs are approximate and assume processing a 60-minute Korean video for subtitles, English translation, and English dubbing (where available). Platforms without TTS (e.g., VEED.IO, Transkriptor) reflect partial processing costs.
-- **Language Support**: Most platforms support Korean and English. Verify specific language availability on their websites.
-- **Use Cases**:
-  - Media/Entertainment: AppTek, Maestra
-  - Social Media: Kapwing, VEED.IO
-  - Podcasts/Interviews: Sonix, Descript
-  - E-learning/Global Content: Transkriptor, HappyScribe
-- **Pricing Updates**: Pricing may vary due to plan changes or promotions. Check official websites for the latest details.
-- For contributions or specific use case recommendations, open an issue or submit a pull request in this repository!
+# Celery Worker (tab mới)
+cd backend
+python -m celery -A app.celery_app worker --loglevel=info
 
-<br />
+# Celery Beat (tab mới)
+cd backend
+python -m celery -A app.celery_app beat --loglevel=info
+```
 
-## ☕ Contributions
+### 4. Frontend Services
 
-Hello, I'm David from the Voice-Pro team.
-Our team discovers the best AI technologies in the industry and provides them for anyone to use easily and conveniently.
-We are a small startup in Korea that has only been around for a year. We are working hard to help you and other creators produce great content.
+```bash
+# Chrome Extension (dev mode)
+pnpm --filter extension dev
 
-Your ⭐⭐⭐⭐⭐ review would be greatly appreciated as it helps our business grow with you. Please help support our small team.
+# Dashboard SPA
+pnpm --filter dashboard dev
 
-Thank you,
-ABUS Customer Service
+# Landing Page
+pnpm --filter landing dev
+```
 
-- If you want to participate in and help us with this project, feel free to create an [Issues](https://github.com/abus-aikorea/voice-pro/issues) 
-- If something goes wrong, please submit a [Pull requests](https://github.com/abus-aikorea/voice-pro/pulls) to improve this project.
-- Any type of contribution is welcome.
-- For inquiries related to purchases, business partnerships, technical tuning, investments, and other matters, please contact us by email. (<abus.aikorea@gmail.com>)."
-- If you like this project, please star this repository. We would greatly appreciate it. ⭐⭐⭐
-- You can support Voice-Pro with a donation here:    
-</a>
-  <a href="https://www.buymeacoffee.com/abus">
-  <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me a Coffee" style="height: 20px;">
-</a>
+### 5. Load Extension vào Chrome
 
+1. Mở `chrome://extensions`
+2. Bật **Developer mode**
+3. Click **Load unpacked** → chọn thư mục `extension/.output/chrome-mv3`
 
+---
 
-## 📬 Contact
-- Email: <abus.aikorea@gmail.com>
-- Homepage (Korean): <https://www.wctokyoseoul.com>
-- Paid Version Purchase: [Shopify (Global)](https://r17wvy-t2.myshopify.com), [Naver (Korean)](https://smartstore.naver.com/abus)
+## API Overview
 
-## 🙏 Credits
-* Demucs: <https://github.com/facebookresearch/demucs>
-* yt-dlp: <https://github.com/yt-dlp/yt-dlp>
-* gradio: <https://github.com/gradio-app/gradio>
-* edge-TTS: <https://github.com/rany2/edge-tts>
-* F5-TTS: <https://github.com/SWivid/F5-TTS.git>
-* openai-whisper: <https://github.com/openai/whisper>
-* faster-whisper: <https://github.com/SYSTRAN/faster-whisper>
-* whisper-timestamped: <https://github.com/linto-ai/whisper-timestamped>
-* whisperX: <https://github.com/m-bain/whisperX>
-* CosyVoice: <https://github.com/FunAudioLLM/CosyVoice>
-* kokoro: <https://github.com/hexgrad/kokoro>
-* Deep-Translator: <https://github.com/nidhaloff/deep-translator>
-* spaCy: <https://github.com/explosion/spaCy>
+Tất cả endpoints có prefix `/api/v1/`. Docs tự động tại `http://localhost:8000/docs`.
 
+| Endpoint | Method | Mô tả |
+|---|---|---|
+| `/api/v1/auth/register` | POST | Đăng ký tài khoản |
+| `/api/v1/auth/login` | POST | Đăng nhập, nhận JWT |
+| `/api/v1/auth/refresh` | POST | Refresh JWT token |
+| `/api/v1/pipeline/process-chunk` | POST | Xử lý audio chunk (STT→MT→TTS) |
+| `/api/v1/pipeline/progress/{job_id}` | GET | SSE stream tiến trình xử lý |
+| `/api/v1/credits/balance` | GET | Số dư credits |
+| `/api/v1/billing/checkout` | POST | Tạo Stripe checkout session |
+| `/api/v1/billing/webhook` | POST | Stripe webhook handler |
+| `/health` | GET | Health check (không cần auth) |
 
+**Error schema chuẩn:**
+```json
+{ "code": "CREDIT_EXHAUSTED", "message": "Hết credits. Vui lòng nâng cấp.", "detail": {} }
+```
 
-## ©️ Copyright
-  <img src="docs/images/ABUS-logo.jpg" width="100" height="100"> by [ABUS](https://www.wctokyoseoul.com)
+---
 
+## Database Migrations
+
+```bash
+cd backend
+
+# Tạo migration mới
+alembic revision --autogenerate -m "mô tả thay đổi"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback 1 bước
+alembic downgrade -1
+```
+
+> **Quy tắc:** KHÔNG sửa migration file đã commit. Tạo migration mới nếu cần thay đổi.
+
+---
+
+## Testing
+
+```bash
+# Backend tests
+cd backend
+python -m pytest tests/ -v
+
+# Chạy với PostgreSQL thật
+python -m pytest tests/ -v -m "not skip_no_db"
+
+# Frontend (extension)
+pnpm --filter extension test
+
+# Frontend (dashboard)
+pnpm --filter dashboard test
+```
+
+> Test cần PostgreSQL chạy trên port 5434. Dùng fixture `postgres_live` để skip khi DB chưa sẵn.
+
+---
+
+## Business Model
+
+| Plan | Giá | Credits |
+|---|---|---|
+| Free | $0/tháng | 10 phút/tháng |
+| Basic | $9/tháng | 120 phút/tháng |
+| Pro | $19/tháng | Unlimited |
+
+**Target metrics (6 tháng):**
+- 10,000+ Chrome Web Store installs
+- 500+ paid users
+- MRR $4,500+
+- Free → Paid conversion ≥ 8%
+- Chrome Store rating ≥ 4.5 sao
+
+---
+
+## Supported Platforms
+
+| Platform | Status |
+|---|---|
+| YouTube | ✅ MVP |
+| Coursera, Vimeo, Udemy, Khan Academy | ✅ MVP |
+| Bất kỳ HTML5 video không có DRM | ✅ MVP |
+| Netflix, Disney+, Amazon Prime, HBO Max | ❌ DRM-protected — graceful error |
+
+---
+
+## Deployment
+
+### Production (Hetzner VPS)
+
+```bash
+# SSH vào VPS
+ssh admin@<vps-ip>
+
+# Deploy mới nhất
+cd /opt/voice-pro
+docker compose pull
+docker compose up -d
+```
+
+### Chrome Web Store
+
+Extension tự động publish khi tạo tag `release/v*`:
+```bash
+git tag release/v1.0.0
+git push origin release/v1.0.0
+```
+
+---
+
+## Security
+
+- Audio xử lý **in-memory only** — không bao giờ lưu ra disk hay database
+- JWT access token: 24h · Refresh token: 30d
+- Payment xử lý hoàn toàn bởi Stripe — không có card data chạm backend
+- CORS whitelist: chỉ extension origin + dashboard domain, không dùng `*`
+- Stripe webhook: idempotency check qua `stripe_event_id` trước khi process
+
+---
+
+## Contributing
+
+```bash
+# Tạo branch mới từ main
+git checkout -b feature/ten-tinh-nang
+
+# Chạy lint trước khi commit
+pnpm -r --if-present run lint
+
+# Format Python
+cd backend && uv run ruff format .
+```
+
+---
+
+## License
+
+MIT
+
+---
+
+*Built on [Voice-Pro](https://github.com/abus-aikorea/voice-pro) stack: Faster-Whisper · Edge-TTS · Deep-Translator*
